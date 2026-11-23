@@ -58,8 +58,6 @@
     position: relative;
     z-index: 1;
   }
-
-  /* Header Card */
   .top-header {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -147,7 +145,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   .btn-row-3 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -163,7 +160,6 @@
     position: relative;
     z-index: 3;
   }
-
   button, select, input, textarea {
     font-family: inherit;
     font-size: 14px;
@@ -202,11 +198,6 @@
     color: #fff;
     border-color: var(--accent);
   }
-  button.ok-btn {
-    background: var(--ok);
-    color: #fff;
-    border-color: var(--ok);
-  }
   button.soft-gray {
     background: #f3f4f6;
     color: #1f2937;
@@ -222,7 +213,6 @@
     padding: 5px 9px;
     font-size: 12px;
   }
-
   input[type="text"], input[type="tel"], input[type="date"], input[type="password"], select, textarea {
     width: 100%;
     border: 1px solid #d1d5db;
@@ -241,8 +231,6 @@
     min-height: 76px;
     resize: vertical;
   }
-
-  /* Stats Grid */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -303,8 +291,6 @@
     color: var(--accent);
     font-weight: 700;
   }
-
-  /* Filter Card */
   .filter-card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -353,8 +339,6 @@
   .link-btn.muted {
     color: #4b5563;
   }
-
-  /* Vehicle List & Cards */
   .vehicle-list {
     display: flex;
     flex-direction: column;
@@ -411,7 +395,6 @@
   .pill.st-wait { background: #fff7ed; color: #c2410c; }
   .pill.st-work { background: #eff6ff; color: #1d4ed8; }
   .pill.st-done { background: #ecfdf5; color: #047857; }
-
   .v-meta {
     display: grid;
     grid-template-columns: 1fr;
@@ -491,8 +474,6 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-
-  /* Damage Selector Chips */
   .damage-picker {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -518,8 +499,6 @@
     color: #ffffff;
     border-color: #111827;
   }
-
-  /* Modal */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -696,7 +675,6 @@
 </head>
 <body>
 <div class="app-wrap">
-  <!-- 상단 헤더 -->
   <header class="top-header">
     <div class="brand-top">
       <div class="acro-box">
@@ -727,7 +705,7 @@
   <div id="partnerReadOnlyBanner" class="readonly-banner">
     🔒 거래처 전용 읽기 전용 화면입니다. 조회·사진 확대·안내문자 복사만 가능하며 등록·수정·삭제는 관리자 전용입니다.
   </div>
-  <!-- 현황 대시보드 -->
+
   <section class="stats-grid">
     <div class="stat-card active" id="stat-ALL" data-status="ALL">
       <div class="stat-top"><span>전체 입고 차량</span><span>🚗</span></div>
@@ -756,7 +734,6 @@
     </div>
   </section>
 
-  <!-- 검색 및 필터 -->
   <section class="filter-card">
     <input type="text" id="searchInput" placeholder="🔍 차량번호(예: 5921), 차종, 고객명, 보험사, 접수번호, 담당자 검색">
     <select id="partnerFilter"></select>
@@ -781,7 +758,6 @@
     </div>
   </section>
 
-  <!-- 차량 목록 -->
   <main id="vehicleList" class="vehicle-list"></main>
 </div>
 
@@ -883,7 +859,6 @@
         </div>
       </div>
 
-      <!-- 손상 부위 세분화 선택 (총 25개) -->
       <div class="form-group">
         <label class="form-label">손상 부위 선택 (원터치 다중 선택)</label>
         <div id="damagePicker" class="damage-picker"></div>
@@ -894,18 +869,16 @@
         <textarea id="fMemo" placeholder="파손 위치, 교환/판금 내용, 특이사항을 입력하세요"></textarea>
       </div>
 
-      <!-- 차량 컨디션 체크 사진 (최대 30장) -->
       <div class="photo-zone condition form-group">
         <div class="photo-meta-row">
           <label class="form-label" style="margin:0;">🩺 차량 컨디션 체크 사진 (최대 30장)</label>
           <span id="conditionCountBadge" class="photo-count">0 / 30장</span>
         </div>
-        <div class="stat-sub" style="margin-bottom:6px;">계기판(주행거리·경고등), 타이어 마모, 실내·외관 기존 상태 기록</div>
+        <div style="font-size:11.5px; color:#6b7280; margin-bottom:6px;">계기판(주행거리·경고등), 타이어 마모, 실내·외관 기존 상태 기록</div>
         <input type="file" id="conditionPhotoInput" accept="image/*" multiple>
         <div id="conditionPhotoPreview" class="photo-grid"></div>
       </div>
 
-      <!-- 작업전 사진 (최대 30장) -->
       <div class="photo-zone form-group">
         <div class="photo-meta-row">
           <label class="form-label" style="margin:0;">📷 작업전 사진 (최대 30장)</label>
@@ -915,7 +888,6 @@
         <div id="beforePhotoPreview" class="photo-grid"></div>
       </div>
 
-      <!-- 작업후 사진 (최대 30장) -->
       <div class="photo-zone after form-group">
         <div class="photo-meta-row">
           <label class="form-label" style="margin:0;">📸 작업후 사진 (최대 30장)</label>
@@ -965,7 +937,7 @@
     <div class="form-group">
       <label class="form-label">거래처 접속 코드 (PIN) *</label>
       <input type="text" id="partnerPinInput" placeholder="예: ACRO-BYD-CJ">
-      <div id="partnerPinHint" class="stat-sub" style="margin-top:4px; color:#6b7280;"></div>
+      <div id="partnerPinHint" style="margin-top:4px; font-size:11.5px; color:#6b7280;"></div>
     </div>
     <button type="button" id="btnSwitchPartner" class="accent" style="width:100%;">해당 거래처 차량만 보기</button>
   </div>
@@ -979,11 +951,11 @@
       <button type="button" class="small" data-close-modal="syncModal">닫기 ✕</button>
     </div>
     <p class="brand-desc" style="white-space:normal; margin-bottom:10px;">
-      원격 Endpoint URL을 저장하면 앱을 열 때와 <strong>10초마다</strong> 자동으로 최신 구글 시트 데이터를 불러오며, 브라우저 탭 간 실시간 동기화(BroadcastChannel)와 JSON 백업도 지원합니다.
+      변경·삭제 시 구글 시트에 반영되며, 수정 직후 <strong>15초간</strong>은 자동 불러오기로 덮어쓰지 않고 이후 10초마다 최신 데이터를 확인합니다.
     </p>
     <div class="filter-row two form-group">
       <div>
-        <label class="form-label">원격 동기화 Endpoint URL (구글 시트)</label>
+        <label class="form-label">원격 동기화 Endpoint URL (구글 시트 /exec)</label>
         <input type="text" id="syncEndpointInput" placeholder="https://script.google.com/macros/s/.../exec">
       </div>
       <div>
@@ -1031,12 +1003,13 @@
 
 <script>
 (function() {
-  const STORAGE_KEY = 'ACRO_MOTORS_VEHICLES_FINAL_V1';
-  const CONFIG_KEY = 'ACRO_MOTORS_CONFIG_FINAL_V1';
-  const CHANNEL_NAME = 'ACRO_MOTORS_SYNC_FINAL_V1';
+  const STORAGE_KEY = 'ACRO_MOTORS_VEHICLES_FINAL_V2';
+  const CONFIG_KEY = 'ACRO_MOTORS_CONFIG_FINAL_V2';
+  const CHANNEL_NAME = 'ACRO_MOTORS_SYNC_FINAL_V2';
   const MAX_PHOTOS_PER_TYPE = 30;
   const DEFAULT_ADMIN_PIN = 'ACRO-0000';
-  const DEFAULT_SYNC_ENDPOINT = 'https://script.googleusercontent.com/macros/echo?user_content_key=AUkAhnTFkPTGX78woBMsZoQ-qjcB37K4iC1iXI8hr59yl6Xt57MIb1KqvMW2g8qRplc4Sv2gHXQ4gi9jo3qx01GvsNKhoivH1iuVsqY3jrYI6tFF4X2vE7b-5vHRLjB1mS08gAu0xTqvQg7kQPd6ZHxKtNwRP9wIq0Ep2VWMa-vvrEsdiMpbPW3cim2apUxxqySqt3RgVKnGQFxbZs_2aCLmdq0vKafOiDuskMFMxjlpPSVw8SXKwBcDiMnN1yAGZkktct8Ii7k5RwWa8FFeIkrlV3_-VDNcMA&lib=MZvChtii8Qv4VT6knLnXdDRPZkqXj7Pn8';
+  const DEFAULT_SYNC_ENDPOINT = 'https://script.google.com/macros/s/AKfycbwDsIQBe53OzGFRpV0x_4E4Dw_CW41MjbbIUQ/exec';
+  const MUTATION_COOLDOWN_MS = 15000;
 
   const memoryStore = {
     [STORAGE_KEY]: null,
@@ -1077,31 +1050,12 @@
   const EXCLUDED_PARTNERS = ['롯데렌터카 대전지점', '수입차 인증중고 딜러'];
 
   const DAMAGE_PARTS = [
-    '앞범퍼',
-    '앞 팬더 (운전석)',
-    '앞 팬더 (조수석)',
-    '앞도어 (운전석)',
-    '앞도어 (조수석)',
-    '뒤도어 (운전석)',
-    '뒤도어 (조수석)',
-    '뒤 팬더 (운전석)',
-    '뒤 팬더 (조수석)',
-    '뒤범퍼',
-    '휠 (운전석 앞)',
-    '휠 (운전석 뒤)',
-    '휠 (조수석 앞)',
-    '휠 (조수석 뒤)',
-    '타이어 (운전석 앞)',
-    '타이어 (운전석 뒤)',
-    '타이어 (조수석 앞)',
-    '타이어 (조수석 뒤)',
-    '헤드라이트 (운전석)',
-    '헤드라이트 (조수석)',
-    '테일램프 (운전석)',
-    '테일램프 (조수석)',
-    '에어백',
-    '하체',
-    '라디에이터'
+    '앞범퍼', '앞 팬더 (운전석)', '앞 팬더 (조수석)', '앞도어 (운전석)', '앞도어 (조수석)',
+    '뒤도어 (운전석)', '뒤도어 (조수석)', '뒤 팬더 (운전석)', '뒤 팬더 (조수석)', '뒤범퍼',
+    '휠 (운전석 앞)', '휠 (운전석 뒤)', '휠 (조수석 앞)', '휠 (조수석 뒤)',
+    '타이어 (운전석 앞)', '타이어 (운전석 뒤)', '타이어 (조수석 앞)', '타이어 (조수석 뒤)',
+    '헤드라이트 (운전석)', '헤드라이트 (조수석)', '테일램프 (운전석)', '테일램프 (조수석)',
+    '에어백', '하체', '라디에이터'
   ];
 
   const INITIAL_VEHICLES = [
@@ -1216,6 +1170,19 @@
     tempDamages: []
   };
 
+  let bc = null;
+  let autoSyncTimer = null;
+  let isSyncingRemote = false;
+  let lastLocalMutationAt = 0;
+
+  function markLocalMutation() {
+    lastLocalMutationAt = Date.now();
+  }
+
+  function isInMutationCooldown() {
+    return (Date.now() - lastLocalMutationAt) < MUTATION_COOLDOWN_MS;
+  }
+
   function setupPwaAssets() {
     try {
       const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#111827"/><rect x="14" y="14" width="164" height="164" rx="26" fill="none" stroke="#374151" stroke-width="4"/><text x="96" y="96" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="44" letter-spacing="4" fill="#ef4444">ACRO</text><text x="96" y="136" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#f9fafb">아크로 공업사</text></svg>';
@@ -1240,16 +1207,14 @@
     } catch (e) {}
   }
 
-  let bc = null;
-  let autoSyncTimer = null;
-  let isSyncingRemote = false;
-
   try {
     if ('BroadcastChannel' in window) {
       bc = new BroadcastChannel(CHANNEL_NAME);
       bc.onmessage = (event) => {
         if (event.data && event.data.type === 'VEHICLES_UPDATED') {
+          markLocalMutation();
           state.vehicles = normalizeVehicles(event.data.vehicles || []);
+          safeSetItem(STORAGE_KEY, JSON.stringify(state.vehicles));
           renderAll();
           showToast('다른 화면에서 변경된 입고 내역이 동기화되었습니다.');
         }
@@ -1270,6 +1235,9 @@
       if (!silent) showToast('먼저 원격 동기화 Endpoint URL을 입력하세요.');
       return;
     }
+    if (silent && isInMutationCooldown()) {
+      return;
+    }
     if (isSyncingRemote) return;
     isSyncingRemote = true;
 
@@ -1279,6 +1247,7 @@
     fetch(fetchUrl, { cache: 'no-store' })
       .then(res => res.json())
       .then(data => {
+        if (silent && isInMutationCooldown()) return;
         const list = parseRemoteVehicleList(data);
         if (!list) {
           if (!silent) showToast('불러올 차량 목록 형식이 올바르지 않습니다.');
@@ -1289,7 +1258,7 @@
         const nextSerialized = JSON.stringify(normalized);
         if (prevSerialized !== nextSerialized) {
           state.vehicles = normalized;
-          saveStorage(false);
+          safeSetItem(STORAGE_KEY, JSON.stringify(state.vehicles));
           if (bc) {
             try { bc.postMessage({ type: 'VEHICLES_UPDATED', vehicles: state.vehicles }); } catch (e) {}
           }
@@ -1318,12 +1287,11 @@
     }
     if (!state.config.syncEndpoint) return;
 
-    // 앱을 열었을 때 즉시 1회 불러오기
     fetchRemoteVehicles({ silent: true });
 
-    // 10초마다 자동으로 원격 데이터 불러오기 (입력 중이거나 모달 편집 중에는 화면 방해 최소화)
     autoSyncTimer = setInterval(() => {
       if (document.hidden) return;
+      if (isInMutationCooldown()) return;
       const modalOpen = document.querySelector('.modal-backdrop.open');
       if (modalOpen) return;
       fetchRemoteVehicles({ silent: true });
@@ -1367,8 +1335,9 @@
   }
 
   function normalizeVehicles(list) {
-    return (list || []).map(v => ({
+    return (list || []).map((v, idx) => ({
       ...v,
+      id: (v && v.id && String(v.id).trim()) ? String(v.id).trim() : `v-auto-${idx}-${Date.now()}`,
       partner: sanitizePartnerName(v.partner),
       tech: sanitizeTechName(v.tech),
       status: v.status === '정비·도장 진행' ? '판금 진행' : (v.status || '입고·견적 대기'),
@@ -1393,7 +1362,6 @@
       };
     } catch (e) {}
 
-    // URL 파라미터로 거래처 전용 링크 접속 시 해당 거래처 모드로 자동 잠금 (?partner=청주 BYD&code=ACRO-BYD-CJ&sync=...)
     try {
       const params = new URLSearchParams(window.location.search);
       const urlSync = params.get('sync');
@@ -1428,18 +1396,28 @@
     saveStorage(false);
   }
 
-  function saveStorage(broadcast = true) {
+  function saveStorage(broadcast = true, meta = {}) {
+    if (broadcast) {
+      markLocalMutation();
+    }
     safeSetItem(STORAGE_KEY, JSON.stringify(state.vehicles));
     safeSetItem(CONFIG_KEY, JSON.stringify(state.config));
+
     if (broadcast && bc) {
       try { bc.postMessage({ type: 'VEHICLES_UPDATED', vehicles: state.vehicles }); } catch (e) {}
     }
+
     if (broadcast && state.config.syncEndpoint) {
       try {
         fetch(state.config.syncEndpoint, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ updatedAt: new Date().toISOString(), vehicles: state.vehicles })
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({
+            action: meta.action || 'sync',
+            id: meta.id || '',
+            updatedAt: new Date().toISOString(),
+            vehicles: state.vehicles
+          })
         }).catch(() => {});
       } catch (e) {}
     }
@@ -1734,7 +1712,7 @@
   }
 
   function openEditModal(id) {
-    const v = state.vehicles.find(item => item.id === id);
+    const v = state.vehicles.find(item => String(item.id) === String(id));
     if (!v) return;
     const isPartnerReadOnly = state.config.role === 'PARTNER';
     document.getElementById('vehicleModalTitle').textContent = isPartnerReadOnly
@@ -1887,26 +1865,27 @@
       conditionPhotos: state.tempConditionPhotos.slice(0, MAX_PHOTOS_PER_TYPE),
       beforePhotos: state.tempBeforePhotos.slice(0, MAX_PHOTOS_PER_TYPE),
       afterPhotos: state.tempAfterPhotos.slice(0, MAX_PHOTOS_PER_TYPE),
-      createdAt: id ? ((state.vehicles.find(v => v.id === id) || {}).createdAt || new Date().toISOString().slice(0, 16).replace('T', ' ')) : new Date().toISOString().slice(0, 16).replace('T', ' ')
+      createdAt: id ? ((state.vehicles.find(v => String(v.id) === String(id)) || {}).createdAt || new Date().toISOString().slice(0, 16).replace('T', ' ')) : new Date().toISOString().slice(0, 16).replace('T', ' ')
     };
 
     if (id) {
-      state.vehicles = state.vehicles.map(v => v.id === id ? payload : v);
+      state.vehicles = state.vehicles.map(v => String(v.id) === String(id) ? payload : v);
+      saveStorage(true, { action: 'update', id: payload.id });
       showToast('차량 정보가 수정되었습니다.');
     } else {
       state.vehicles.unshift(payload);
+      saveStorage(true, { action: 'create', id: payload.id });
       showToast('신규 차량이 입고 등록되었습니다.');
     }
 
-    saveStorage(true);
     closeModal('vehicleModal');
     renderAll();
   }
 
   function quickStatusChange(id, newStatus) {
     if (state.config.role === 'PARTNER') return;
-    state.vehicles = state.vehicles.map(v => v.id === id ? { ...v, status: newStatus } : v);
-    saveStorage(true);
+    state.vehicles = state.vehicles.map(v => String(v.id) === String(id) ? { ...v, status: newStatus } : v);
+    saveStorage(true, { action: 'status', id });
     renderAll();
     showToast(`공정이 '${newStatus}'(으)로 변경되었습니다.`);
   }
@@ -1914,21 +1893,18 @@
   function deleteVehicle(id) {
     if (state.config.role === 'PARTNER') return;
     if (!confirm('해당 차량 입고 내역을 삭제하시겠습니까?')) return;
-    state.vehicles = state.vehicles.filter(v => v.id !== id);
-    saveStorage(true);
+    state.vehicles = state.vehicles.filter(v => String(v.id) !== String(id));
+    saveStorage(true, { action: 'delete', id });
     renderAll();
     showToast('삭제되었습니다.');
   }
 
   function copyCustomerSms(id) {
-    const v = state.vehicles.find(item => item.id === id);
+    const v = state.vehicles.find(item => String(item.id) === String(id));
     if (!v) return;
-    const dmgText = (v.damages && v.damages.length) ? `
-손상부위: ${v.damages.join(', ')}` : '';
-    const insText = v.insurance ? `
-보험사: ${v.insurance}${v.claimNo ? ` (${v.claimNo})` : ''}` : '';
-    const msg = `[ACRO 아크로 공업사] ${v.customer || '고객'}님 차량(${v.plate} / ${v.model}) 현재 공정은 [${v.status}]입니다.${insText}${dmgText}${v.dueDate ? `
-출고예정일: ${v.dueDate}` : ''}`;
+    const dmgText = (v.damages && v.damages.length) ? `\n손상부위: ${v.damages.join(', ')}` : '';
+    const insText = v.insurance ? `\n보험사: ${v.insurance}${v.claimNo ? ` (${v.claimNo})` : ''}` : '';
+    const msg = `[ACRO 아크로 공업사] ${v.customer || '고객'}님 차량(${v.plate} / ${v.model}) 현재 공정은 [${v.status}]입니다.${insText}${dmgText}${v.dueDate ? `\n출고예정일: ${v.dueDate}` : ''}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).then(() => showToast('고객 안내 문자가 복사되었습니다.')).catch(() => fallbackCopy(msg));
     } else {
@@ -2122,7 +2098,7 @@
           return;
         }
         state.vehicles = normalizeVehicles(list);
-        saveStorage(true);
+        saveStorage(true, { action: 'import' });
         renderAll();
         closeModal('syncModal');
         showToast('JSON 백업 데이터를 복원했습니다.');
@@ -2135,7 +2111,7 @@
   }
 
   function viewCardPhoto(vehicleId, kind, idx) {
-    const v = state.vehicles.find(item => item.id === vehicleId);
+    const v = state.vehicles.find(item => String(item.id) === String(vehicleId));
     if (!v) return;
     const arr = kind === 'condition' ? v.conditionPhotos : (kind === 'before' ? v.beforePhotos : v.afterPhotos);
     const label = kind === 'condition' ? '차량 컨디션 체크' : (kind === 'before' ? '작업전' : '작업후');
@@ -2178,7 +2154,7 @@
     document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
     const allCard = document.getElementById('stat-ALL');
     if (allCard) allCard.classList.add('active');
-    saveStorage(true);
+    saveStorage(true, { action: 'restore' });
     renderAll();
     showToast('초기 샘플 데이터로 복원되었습니다.');
   }
@@ -2346,7 +2322,7 @@
   renderAll();
   startAutoRemoteSync();
   document.addEventListener('visibilitychange', () => {
-    if (!document.hidden && state.config.syncEndpoint) {
+    if (!document.hidden && state.config.syncEndpoint && !isInMutationCooldown()) {
       fetchRemoteVehicles({ silent: true });
     }
   });
