@@ -58,8 +58,6 @@
     position: relative;
     z-index: 1;
   }
-
-  /* Header Card */
   .top-header {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -147,7 +145,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   .btn-row-3 {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -163,7 +160,6 @@
     position: relative;
     z-index: 3;
   }
-
   button, select, input, textarea {
     font-family: inherit;
     font-size: 14px;
@@ -218,7 +214,6 @@
     padding: 5px 9px;
     font-size: 12px;
   }
-
   input[type="text"], input[type="tel"], input[type="date"], input[type="password"], select, textarea {
     width: 100%;
     border: 1px solid #d1d5db;
@@ -237,8 +232,6 @@
     min-height: 76px;
     resize: vertical;
   }
-
-  /* Stats Grid */
   .stats-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -299,8 +292,6 @@
     color: var(--accent);
     font-weight: 700;
   }
-
-  /* Filter Card */
   .filter-card {
     background: var(--surface);
     border: 1px solid var(--line);
@@ -349,8 +340,6 @@
   .link-btn.muted {
     color: #4b5563;
   }
-
-  /* Vehicle List & Cards */
   .vehicle-list {
     display: flex;
     flex-direction: column;
@@ -407,7 +396,6 @@
   .pill.st-wait { background: #fff7ed; color: #c2410c; }
   .pill.st-work { background: #eff6ff; color: #1d4ed8; }
   .pill.st-done { background: #ecfdf5; color: #047857; }
-
   .v-meta {
     display: grid;
     grid-template-columns: 1fr;
@@ -501,8 +489,6 @@
       grid-template-columns: repeat(4, minmax(0, 1fr));
     }
   }
-
-  /* Damage Selector Chips */
   .damage-picker {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -528,8 +514,6 @@
     color: #ffffff;
     border-color: #111827;
   }
-
-  /* Modal */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -554,85 +538,4 @@
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding: 16px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
-  }
-  .modal-head {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--line);
-    margin-bottom: 12px;
-  }
-  .modal-title {
-    font-size: 16px;
-    font-weight: 800;
-    margin: 0;
-  }
-  .form-group {
-    margin-bottom: 11px;
-  }
-  .form-label {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 700;
-    margin-bottom: 4px;
-    color: #1f2937;
-  }
-  .stat-sub {
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .photo-zone {
-    border: 1.5px dashed #9ca3af;
-    border-radius: var(--radius-sm);
-    padding: 10px;
-    background: var(--surface-2);
-    margin-bottom: 10px;
-  }
-  .photo-zone.after {
-    border-color: #60a5fa;
-    background: #f8faff;
-  }
-  .photo-zone.condition {
-    border-color: #34d399;
-    background: #f0fdf4;
-  }
-  .photo-meta-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-    flex-wrap: wrap;
-    margin-bottom: 6px;
-  }
-  .photo-count {
-    font-size: 11.5px;
-    font-weight: 700;
-    color: #374151;
-  }
-  .photo-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 8px;
-  }
-  .photo-item {
-    position: relative;
-    width: 72px;
-    height: 72px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    background: #fff;
-  }
-  .photo-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-  }
-  .photo-del {
-    position: absolute;
-    top: 2px
+    box-shadow:
