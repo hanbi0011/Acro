@@ -1,4 +1,326 @@
-<div class="modal-head">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#111827">
+<title>ACRO MOTORS · 아크로 공업사 차량 입고·정비 관리</title>
+<style>
+  :root {
+    --bg: #f3f4f6;
+    --surface: #ffffff;
+    --surface-2: #f9fafb;
+    --ink: #111827;
+    --muted: #6b7280;
+    --line: #e5e7eb;
+    --primary: #111827;
+    --primary-ink: #ffffff;
+    --accent: #2563eb;
+    --accent-soft: #eff6ff;
+    --ok: #059669;
+    --ok-soft: #ecfdf5;
+    --warn: #d97706;
+    --warn-soft: #fffbeb;
+    --danger: #dc2626;
+    --danger-soft: #fef2f2;
+    --radius: 14px;
+    --radius-sm: 10px;
+    --shadow: 0 2px 10px rgba(0,0,0,0.05);
+  }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: rgba(37, 99, 235, 0.22); }
+  html, body {
+    margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
+    font-size: 14px; line-height: 1.45; overflow-x: hidden;
+  }
+  .app-wrap { max-width: 980px; margin: 0 auto; padding: 12px; padding-bottom: 92px; }
+  .top-header, .stat-card, .filter-card, .v-card {
+    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  }
+  .top-header { padding: 12px; margin-bottom: 12px; }
+  .brand-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .acro-box {
+    background: #111827; color: #fff; padding: 6px 10px; border-radius: 8px; text-align: center; line-height: 1.1; flex-shrink: 0;
+  }
+  .acro-box .en { display: block; font-weight: 900; font-size: 14px; letter-spacing: 0.06em; color: #ef4444; }
+  .acro-box .sub { display: block; font-weight: 700; font-size: 9px; letter-spacing: 0.12em; color: #e5e7eb; margin-top: 2px; }
+  .brand-title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .brand-name { font-size: 16px; font-weight: 800; }
+  .mode-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); border: 1px solid #bfdbfe; }
+  .mode-pill.partner { background: var(--warn-soft); color: var(--warn); border-color: #fde68a; }
+  .sync-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); border: 1px solid #a7f3d0; }
+  .brand-desc { margin: 3px 0 0 0; font-size: 11.5px; color: var(--muted); }
+  .btn-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 7px; }
+  .btn-row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
+
+  button, select, input, textarea { font-family: inherit; font-size: 14px; max-width: 100%; }
+  button {
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--radius-sm);
+    padding: 8px 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+    gap: 5px; min-height: 42px; font-size: 12.5px;
+  }
+  button:disabled { opacity: 0.55; cursor: not-allowed; }
+  button.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
+  button.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.soft-gray { background: #f3f4f6; color: #1f2937; }
+  button.danger-soft { background: var(--danger-soft); color: var(--danger); border-color: #fecaca; }
+  button.small { min-height: 36px; padding: 5px 9px; font-size: 12px; }
+
+  input[type="text"], input[type="tel"], input[type="date"], input[type="password"], select, textarea {
+    width: 100%; border: 1px solid #d1d5db; background: #fff; color: var(--ink); border-radius: var(--radius-sm); padding: 9px 11px; min-height: 42px;
+  }
+  textarea { min-height: 76px; resize: vertical; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+  @media (min-width: 720px) { .stats-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+  .stat-card { padding: 13px 14px; cursor: pointer; }
+  .stat-card.active { border: 1.5px solid #3b82f6; background: #f8faff; }
+  .stat-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
+  .stat-num { font-size: 24px; font-weight: 800; line-height: 1.15; margin-bottom: 6px; }
+  .stat-bottom { font-size: 11px; color: var(--muted); }
+
+  .filter-card { padding: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+  .filter-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
+  @media (min-width: 640px) { .filter-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+  .link-btn { background: none; border: none; min-height: 32px; padding: 2px 6px; font-size: 12px; font-weight: 700; color: var(--accent); }
+  .link-btn.muted { color: #4b5563; }
+
+  .vehicle-list { display: flex; flex-direction: column; gap: 10px; }
+  .v-card { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+  .v-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+  .v-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+  .v-plate { font-size: 20px; font-weight: 900; }
+  .v-model { font-size: 13px; color: var(--muted); font-weight: 600; }
+  .pill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  .pill.partner { background: #eff6ff; color: #1d4ed8; }
+  .pill.type { background: #f3f4f6; color: #374151; }
+  .pill.rental { background: #fef3c7; color: #92400e; }
+  .pill.st-wait { background: #fff7ed; color: #c2410c; }
+  .pill.st-work { background: #eff6ff; color: #1d4ed8; }
+  .pill.st-done { background: #ecfdf5; color: #047857; }
+
+  .v-meta { display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 12.5px; color: #374151; background: var(--surface-2); padding: 9px 10px; border-radius: var(--radius-sm); }
+  @media (min-width: 640px) { .v-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .damage-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+  .d-tag { font-size: 11px; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 2px 7px; border-radius: 6px; }
+  .v-memo { font-size: 12.5px; color: #374151; white-space: pre-line; }
+  .v-photos-preview { display: flex; gap: 8px; flex-wrap: wrap; }
+  .thumb-box { width: 64px; height: 64px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); position: relative; cursor: pointer; }
+  .thumb-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .thumb-tag { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(17,24,39,0.78); color: #fff; font-size: 9.5px; text-align: center; padding: 1px 0; }
+  .v-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  @media (min-width: 640px) { .v-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  .damage-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+  @media (min-width: 640px) { .damage-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .dmg-btn { min-height: 38px; padding: 6px 8px; font-size: 12px; justify-content: flex-start; }
+  .dmg-btn.selected { background: #111827; color: #fff; border-color: #111827; }
+
+  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.52); display: none; align-items: center; justify-content: center; padding: 12px; z-index: 9999; overflow-y: auto; }
+  .modal-backdrop.open { display: flex; }
+  .modal-box { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto; padding: 16px; }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+  .modal-title { font-size: 16px; font-weight: 800; margin: 0; }
+  .form-group { margin-bottom: 11px; }
+  .form-label { display: block; font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
+  .photo-zone { border: 1.5px dashed #9ca3af; border-radius: var(--radius-sm); padding: 10px; background: var(--surface-2); margin-bottom: 10px; }
+  .photo-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .photo-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .photo-item { position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
+  .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .photo-del { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; min-height: 22px; padding: 0; border-radius: 999px; font-size: 11px; background: rgba(220,38,38,0.92); color: #fff; border: none; }
+
+  .code-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  .code-table th, .code-table td { border: 1px solid var(--line); padding: 7px 8px; text-align: left; }
+  .code-table th { background: var(--surface-2); }
+
+  .toast {
+    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
+    background: #111827; color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 12.5px;
+    font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.2s ease; z-index: 20000;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .readonly-banner { display: none; background: #fffbeb; border: 1px solid #f59e0b; color: #92400e; border-radius: var(--radius-sm); padding: 9px 12px; margin-bottom: 10px; font-size: 12px; font-weight: 700; }
+  .readonly-banner.show { display: block; }
+  .empty-box { background: var(--surface); border: 1px dashed #cbd5e1; border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); }
+</style>
+</head>
+<body>
+<div class="app-wrap">
+  <header class="top-header">
+    <div class="brand-top">
+      <div class="acro-box"><span class="en">ACRO</span><span class="sub">MOTORS</span></div>
+      <div>
+        <div class="brand-title-row">
+          <span class="brand-name">아크로 공업사</span>
+          <span id="modeBadge" class="mode-pill">관리자 모드</span>
+          <span id="syncStatusBadge" class="sync-pill">⚡ 동기화 대기</span>
+        </div>
+        <p class="brand-desc">수입·국산 종합정비 · 판금·열처리 도장 · 보험수리 · 대차 실시간 관리 포털</p>
+      </div>
+    </div>
+    <div class="btn-row-3">
+      <button type="button" id="btnAdminMode" class="primary">👤 관리자 모드</button>
+      <button type="button" id="btnPartnerMode" class="soft-gray">🏢 거래처 모드</button>
+      <button type="button" id="btnSyncCode" class="soft-gray">☁️ 동기화·코드</button>
+    </div>
+    <div class="btn-row-2">
+      <button type="button" id="btnSaveHtml" class="soft-gray">💾 .html 저장</button>
+      <button type="button" id="btnNewVehicle" class="accent">+ 신규 차량 입고</button>
+    </div>
+  </header>
+
+  <div id="partnerReadOnlyBanner" class="readonly-banner"></div>
+
+  <section class="stats-grid">
+    <div class="stat-card active" id="stat-ALL" data-status="ALL"><div class="stat-top"><span>전체 입고 차량</span><span>🚗</span></div><div class="stat-num" id="cnt-ALL">0</div><div class="stat-bottom">전체 보기</div></div>
+    <div class="stat-card" id="stat-입고·견적 대기" data-status="입고·견적 대기"><div class="stat-top"><span>입고·견적 대기</span><span>⏳</span></div><div class="stat-num" id="cnt-WAIT">0</div><div class="stat-bottom">접수·부품</div></div>
+    <div class="stat-card" id="stat-판금 진행" data-status="판금 진행"><div class="stat-top"><span>판금 진행</span><span>🔨</span></div><div class="stat-num" id="cnt-METAL">0</div><div class="stat-bottom">차체·판금</div></div>
+    <div class="stat-card" id="stat-도장 진행" data-status="도장 진행"><div class="stat-top"><span>도장 진행</span><span>🎨</span></div><div class="stat-num" id="cnt-PAINT">0</div><div class="stat-bottom">열처리·도장</div></div>
+    <div class="stat-card" id="stat-출고 대기·완료" data-status="출고 대기·완료"><div class="stat-top"><span>출고 대기·완료</span><span>✅</span></div><div class="stat-num" id="cnt-DONE">0</div><div class="stat-bottom">인도 준비</div></div>
+  </section>
+
+  <section class="filter-card">
+    <input type="text" id="searchInput" placeholder="🔍 차량번호(예: 5921), 차종, 고객명, 보험사, 접수번호, 담당자 검색">
+    <select id="partnerFilter"></select>
+    <select id="typeFilter">
+      <option value="ALL">입고 구분: 전체</option>
+      <option value="보험수리">보험수리</option>
+      <option value="일반정비">일반정비</option>
+      <option value="판금·도장">판금·도장</option>
+      <option value="출고점검">출고점검</option>
+    </select>
+    <select id="rentalFilter">
+      <option value="ALL">대차(렌터카): 전체</option>
+      <option value="RENTAL">대차 신청 차량</option>
+      <option value="NO_RENTAL">대차 미신청</option>
+    </select>
+    <div class="filter-footer">
+      <div>
+        <span id="resultCountText">조회된 차량: 0대</span>
+        <button type="button" id="btnResetFilters" class="link-btn">필터 초기화</button>
+      </div>
+      <button type="button" id="btnRestoreSample" class="link-btn muted">↺ 초기 샘플 데이터 복원</button>
+    </div>
+  </section>
+
+  <main id="vehicleList" class="vehicle-list"></main>
+</div>
+
+<div id="vehicleModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="vehicleModalTitle" class="modal-title">신규 차량 입고</h3>
+      <button type="button" class="small" data-close-modal="vehicleModal">닫기 ✕</button>
+    </div>
+    <form id="vehicleForm">
+      <input type="hidden" id="editVehicleId">
+      <div class="filter-row two form-group">
+        <div><label class="form-label">의뢰 거래처 *</label><select id="fPartner" required></select></div>
+        <div>
+          <label class="form-label">입고 구분 *</label>
+          <select id="fType" required>
+            <option value="보험수리">보험수리</option>
+            <option value="일반정비">일반정비</option>
+            <option value="판금·도장">판금·도장</option>
+            <option value="출고점검">출고점검</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">차량번호 *</label><input type="text" id="fPlate" required placeholder="예: 219하 4410"></div>
+        <div><label class="form-label">차종 *</label><input type="text" id="fModel" required placeholder="예: BYD 아토 3"></div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">고객명</label><input type="text" id="fCustomer" placeholder="예: 홍길동"></div>
+        <div><label class="form-label">연락처</label><input type="tel" id="fPhone" placeholder="예: 010-1234-5678"></div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">보험사</label><input type="text" id="fInsurance" placeholder="예: 삼성화재, DB손해보험"></div>
+        <div><label class="form-label">보험/사고 접수번호</label><input type="text" id="fClaimNo" placeholder="예: 2026-88412"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><input type="checkbox" id="fRental" style="width:auto;min-height:auto;margin-right:6px;">대차(렌터카) 지원 신청</label>
+        <input type="text" id="fRentalInfo" placeholder="대차 차종 또는 차량번호" style="display:none;margin-top:6px;">
+      </div>
+      <div class="filter-row two form-group">
+        <div>
+          <label class="form-label">공정 상태</label>
+          <select id="fStatus">
+            <option value="입고·견적 대기">입고·견적 대기</option>
+            <option value="판금 진행">판금 진행</option>
+            <option value="도장 진행">도장 진행</option>
+            <option value="출고 대기·완료">출고 대기·완료</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">담당 정비사 / 팀장</label>
+          <select id="fTech">
+            <option value="판금부 최성윤 팀장">판금부 최성윤 팀장</option>
+            <option value="도장부 강신철">도장부 강신철</option>
+            <option value="정비부 이성제 팀장">정비부 이성제 팀장</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">출고 예정일</label><input type="date" id="fDueDate"></div>
+        <div><label class="form-label">예상 수리비 (원)</label><input type="text" id="fEstimate" placeholder="예: 850,000"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">손상 부위 선택</label>
+        <div id="damagePicker" class="damage-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">정비/파손 메모</label>
+        <textarea id="fMemo" placeholder="특이사항을 입력하세요"></textarea>
+      </div>
+      <div class="photo-zone form-group">
+        <label class="form-label">🩺 컨디션 체크 사진 (최대 10장)</label>
+        <input type="file" id="conditionPhotoInput" accept="image/*" multiple>
+        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
+        <div id="conditionPhotoPreview" class="photo-grid"></div>
+      </div>
+      <div class="photo-zone form-group">
+        <label class="form-label">📷 작업전 사진 (최대 10장)</label>
+        <input type="file" id="beforePhotoInput" accept="image/*" multiple>
+        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
+        <div id="beforePhotoPreview" class="photo-grid"></div>
+      </div>
+      <div class="photo-zone form-group">
+        <label class="form-label">📸 작업후 사진 (최대 10장)</label>
+        <input type="file" id="afterPhotoInput" accept="image/*" multiple>
+        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
+        <div id="afterPhotoPreview" class="photo-grid"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+        <button type="button" data-close-modal="vehicleModal">취소</button>
+        <button type="submit" id="btnSubmitVehicle" class="primary">저장하기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="adminModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head"><h3 class="modal-title">👤 관리자 로그인</h3><button type="button" class="small" data-close-modal="adminModal">닫기 ✕</button></div>
+    <div class="form-group"><label class="form-label">관리자 PIN</label><input type="password" id="adminPinInput" placeholder="초기값: ACRO-0000"></div>
+    <button type="button" id="btnConfirmAdmin" class="primary" style="width:100%;">관리자 모드로 전환</button>
+  </div>
+</div>
+
+<div id="partnerModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head"><h3 class="modal-title">🏢 거래처 전용 접속</h3><button type="button" class="small" data-close-modal="partnerModal">닫기 ✕</button></div>
+    <div class="form-group"><label class="form-label">거래처 선택</label><select id="partnerAuthSelect"></select></div>
+    <div class="form-group"><label class="form-label">거래처 접속 코드</label><input type="text" id="partnerPinInput" placeholder="예: ACRO-BYD-CJ"></div>
+    <button type="button" id="btnSwitchPartner" class="accent" style="width:100%;">거래처 화면 보기</button>
+  </div>
+</div>
+
+<div id="syncModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head">
       <h3 class="modal-title">☁️ 구글 시트 동기화 설정</h3>
       <button type="button" class="small" data-close-modal="syncModal">닫기 ✕</button>
     </div>
@@ -101,7 +423,7 @@
   ];
 
   let state = {
-    mode: 'ADMIN', // 'ADMIN' | 'PARTNER'
+    mode: 'ADMIN',
     activePartner: 'ALL',
     statusFilter: 'ALL',
     search: '',
@@ -130,7 +452,12 @@
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed)) state.vehicles = parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          state.vehicles = parsed;
+        } else {
+          state.vehicles = JSON.parse(JSON.stringify(SAMPLE_VEHICLES));
+          saveVehicles();
+        }
       } else {
         state.vehicles = JSON.parse(JSON.stringify(SAMPLE_VEHICLES));
         saveVehicles();
