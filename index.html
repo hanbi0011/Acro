@@ -191,6 +191,10 @@
     position: relative;
     z-index: 4;
   }
+  button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
   button:active { transform: scale(0.99); opacity: 0.9; }
   button.primary {
     background: var(--primary);
@@ -594,6 +598,12 @@
     font-weight: 700;
     color: #374151;
   }
+  .upload-status-text {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-top: 4px;
+  }
   .photo-grid {
     display: flex;
     flex-wrap: wrap;
@@ -703,7 +713,7 @@
         <div class="brand-title-row">
           <span class="brand-name">아크로 공업사</span>
           <span id="modeBadge" class="mode-pill">관리자 모드</span>
-          <span id="syncStatusBadge" class="sync-pill">⚡ 동기화 준비됨</span>
+          <span id="syncStatusBadge" class="sync-pill">📁 구글 드라이브 연동</span>
         </div>
         <p class="brand-desc">수입·국산 종합정비 · 판금·열처리 도장 · 보험수리 · 대차 관리 포털</p>
       </div>
@@ -810,7 +820,7 @@
 
       <div class="filter-row two form-group">
         <div>
-          <label class="form-label">차량번호 *</label>
+          <label class="form-label">차량번호 * (사진 파일명에도 사용)</label>
           <input type="text" id="fPlate" required placeholder="예: 42라7945 / 219하 4410">
         </div>
         <div>
@@ -891,40 +901,43 @@
         <textarea id="fMemo" placeholder="파손 위치, 교환/판금 내용, 특이사항을 입력하세요"></textarea>
       </div>
 
-      <!-- 차량 컨디션 체크 사진 (최대 30장) -->
+      <!-- 차량 컨디션 체크 사진 (최대 30장 · 구글 드라이브 업로드) -->
       <div class="photo-zone condition form-group">
         <div class="photo-meta-row">
-          <label class="form-label" style="margin:0;">🩺 차량 컨디션 체크 사진 (최대 30장)</label>
+          <label class="form-label" style="margin:0;">🩺 차량 컨디션 체크 사진 (최대 30장 · 드라이브 저장)</label>
           <span id="conditionCountBadge" class="photo-count">0 / 30장</span>
         </div>
         <div class="stat-sub" style="margin-bottom:6px;">계기판(주행거리·경고등), 타이어 마모, 실내·외관 기존 상태 기록</div>
         <input type="file" id="conditionPhotoInput" accept="image/*" multiple>
+        <div id="conditionUploadStatus" class="upload-status-text" style="display:none;"></div>
         <div id="conditionPhotoPreview" class="photo-grid"></div>
       </div>
 
-      <!-- 작업전 사진 (최대 30장) -->
+      <!-- 작업전 사진 (최대 30장 · 구글 드라이브 업로드) -->
       <div class="photo-zone form-group">
         <div class="photo-meta-row">
-          <label class="form-label" style="margin:0;">📷 작업전 사진 (최대 30장)</label>
+          <label class="form-label" style="margin:0;">📷 작업전 사진 (최대 30장 · 드라이브 저장)</label>
           <span id="beforeCountBadge" class="photo-count">0 / 30장</span>
         </div>
         <input type="file" id="beforePhotoInput" accept="image/*" multiple>
+        <div id="beforeUploadStatus" class="upload-status-text" style="display:none;"></div>
         <div id="beforePhotoPreview" class="photo-grid"></div>
       </div>
 
-      <!-- 작업후 사진 (최대 30장) -->
+      <!-- 작업후 사진 (최대 30장 · 구글 드라이브 업로드) -->
       <div class="photo-zone after form-group">
         <div class="photo-meta-row">
-          <label class="form-label" style="margin:0;">📸 작업후 사진 (최대 30장)</label>
+          <label class="form-label" style="margin:0;">📸 작업후 사진 (최대 30장 · 드라이브 저장)</label>
           <span id="afterCountBadge" class="photo-count">0 / 30장</span>
         </div>
         <input type="file" id="afterPhotoInput" accept="image/*" multiple>
+        <div id="afterUploadStatus" class="upload-status-text" style="display:none;"></div>
         <div id="afterPhotoPreview" class="photo-grid"></div>
       </div>
 
       <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">
         <button type="button" data-close-modal="vehicleModal">취소</button>
-        <button type="submit" class="primary">저장하기</button>
+        <button type="submit" id="btnSaveVehicleSubmit" class="primary">저장하기</button>
       </div>
     </form>
   </div>
@@ -972,15 +985,15 @@
 <div id="syncModal" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-head">
-      <h3 class="modal-title">동기화 · 거래처 접속 코드</h3>
+      <h3 class="modal-title">구글 드라이브 · 시트 동기화 · 접속 코드</h3>
       <button type="button" class="small" data-close-modal="syncModal">닫기 ✕</button>
     </div>
     <p class="brand-desc" style="white-space:normal; margin-bottom:10px;">
-      원격 Endpoint URL을 저장한 뒤 <strong>원격 데이터 불러오기</strong> 버튼을 누르거나, 브라우저 탭 간 동기화(BroadcastChannel) 및 JSON 백업/복원을 사용할 수 있습니다.
+      사진은 구글 드라이브(<code>ACRO_차량사진</code>)에 업로드되고, 링크는 시트(<code>ACRO_아크로공업사_차량입고관리_V2</code>) 및 브라우저에 함께 저장됩니다.
     </p>
     <div class="filter-row two form-group">
       <div>
-        <label class="form-label">원격 동기화 Endpoint URL (구글 시트)</label>
+        <label class="form-label">구글 앱스 스크립트 웹앱 URL</label>
         <input type="text" id="syncEndpointInput" placeholder="https://script.google.com/macros/s/.../exec">
       </div>
       <div>
@@ -990,6 +1003,7 @@
     </div>
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
       <button type="button" id="btnPullRemote" class="small">원격 데이터 불러오기</button>
+      <button type="button" id="btnPushAllRemote" class="small">시트 전체 동기화(syncAll)</button>
       <button type="button" id="btnExportJson" class="small">JSON 백업 저장</button>
       <button type="button" id="btnImportJsonTrigger" class="small">JSON 백업 불러오기</button>
       <input type="file" id="importJsonInput" accept="application/json,.json" style="display:none;">
@@ -1020,7 +1034,12 @@
       <h3 id="photoViewerTitle" class="modal-title">사진 보기</h3>
       <button type="button" class="small" data-close-modal="photoViewerModal">닫기 ✕</button>
     </div>
-    <img id="photoViewerImg" src="" alt="확대 사진" style="max-width:100%; max-height:70vh; border-radius:10px;">
+    <img id="photoViewerImg" src="" alt="확대 사진" style="max-width:100%; max-height:68vh; border-radius:10px;">
+    <div id="photoViewerDriveWrap" style="margin-top:10px; display:none;">
+      <a id="photoViewerDriveLink" href="#" target="_blank" rel="noopener noreferrer" style="font-size:12.5px; font-weight:700; color:#2563eb;">
+        ↗ 구글 드라이브에서 열기
+      </a>
+    </div>
   </div>
 </div>
 
@@ -1028,7 +1047,8 @@
 
 <script>
 (function() {
-  const STORAGE_KEY = 'ACRO_MOTORS_VEHICLES_FINAL_V1';
+  const STORAGE_KEY = 'ACRO_MOTORS_VEHICLES_DRIVE_V2';
+  const LEGACY_STORAGE_KEYS = ['ACRO_MOTORS_VEHICLES_DRIVE_V1', 'ACRO_MOTORS_VEHICLES_FINAL_V1'];
   const CONFIG_KEY = 'ACRO_MOTORS_CONFIG_FINAL_V1';
   const CHANNEL_NAME = 'ACRO_MOTORS_SYNC_FINAL_V1';
   const MAX_PHOTOS_PER_TYPE = 30;
@@ -1054,7 +1074,9 @@
         window.localStorage.setItem(key, val);
         return true;
       }
-    } catch (e) {}
+    } catch (e) {
+      showToast('브라우저 저장 공간이 부족합니다. 오래된 기록이나 사진은 시트/드라이브로 정리해 주세요.');
+    }
     return false;
   }
 
@@ -1123,7 +1145,9 @@
       conditionPhotos: [],
       beforePhotos: [],
       afterPhotos: [],
-      createdAt: '2026-11-24 08:27'
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-24 08:27',
+      updatedAt: '2026-11-24 08:27'
     },
     {
       id: 'v-9001',
@@ -1146,7 +1170,9 @@
       conditionPhotos: [],
       beforePhotos: [],
       afterPhotos: [],
-      createdAt: '2026-11-21 10:20'
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-21 10:20',
+      updatedAt: '2026-11-21 10:20'
     },
     {
       id: 'v-9002',
@@ -1169,7 +1195,9 @@
       conditionPhotos: [],
       beforePhotos: [],
       afterPhotos: [],
-      createdAt: '2026-11-20 15:10'
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-20 15:10',
+      updatedAt: '2026-11-20 15:10'
     },
     {
       id: 'v-9003',
@@ -1192,7 +1220,9 @@
       conditionPhotos: [],
       beforePhotos: [],
       afterPhotos: [],
-      createdAt: '2026-11-22 09:05'
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-22 09:05',
+      updatedAt: '2026-11-22 09:05'
     },
     {
       id: 'v-9004',
@@ -1215,7 +1245,9 @@
       conditionPhotos: [],
       beforePhotos: [],
       afterPhotos: [],
-      createdAt: '2026-11-19 13:40'
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-19 13:40',
+      updatedAt: '2026-11-19 13:40'
     }
   ];
 
@@ -1233,8 +1265,107 @@
     tempConditionPhotos: [],
     tempBeforePhotos: [],
     tempAfterPhotos: [],
-    tempDamages: []
+    tempDamages: [],
+    uploadingCount: 0
   };
+
+  function nowFormatted() {
+    const d = new Date();
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
+  /* 드라이브 URL에서 fileId 추출 헬퍼 */
+  function extractDriveFileId(url) {
+    if (!url) return '';
+    const s = String(url);
+    const m1 = s.match(/\/d\/([a-zA-Z0-9_-]+)/);
+    if (m1 && m1[1]) return m1[1];
+    const m2 = s.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m2 && m2[1]) return m2[1];
+    return '';
+  }
+
+  function buildThumbFromIdOrUrl(id, url) {
+    if (id) {
+      return `https://drive.google.com/thumbnail?id=${id}&sz=w800`;
+    }
+    const extracted = extractDriveFileId(url);
+    if (extracted) {
+      return `https://drive.google.com/thumbnail?id=${extracted}&sz=w800`;
+    }
+    return url || '';
+  }
+
+  function normalizePhotoItem(item, kind = 'photo') {
+    if (!item) return null;
+    if (typeof item === 'string') {
+      const trimmed = item.trim();
+      if (!trimmed) return null;
+      const isDataUrl = trimmed.startsWith('data:');
+      const fileId = isDataUrl ? '' : extractDriveFileId(trimmed);
+      return {
+        id: fileId,
+        name: '',
+        kind: kind,
+        url: trimmed,
+        thumbUrl: isDataUrl ? trimmed : buildThumbFromIdOrUrl(fileId, trimmed),
+        driveUrl: isDataUrl ? '' : trimmed
+      };
+    }
+    if (typeof item === 'object') {
+      const rawUrl = item.url || item.driveUrl || item.thumbUrl || '';
+      const fileId = item.id || extractDriveFileId(rawUrl);
+      const url = rawUrl || (fileId ? `https://drive.google.com/file/d/${fileId}/view` : '');
+      const thumbUrl = item.thumbUrl || (fileId ? `https://drive.google.com/thumbnail?id=${fileId}&sz=w800` : url);
+      if (!url && !thumbUrl) return null;
+      return {
+        id: fileId,
+        name: item.name || '',
+        kind: item.kind || kind,
+        url: url,
+        thumbUrl: thumbUrl,
+        driveUrl: item.driveUrl || rawUrl || url
+      };
+    }
+    return null;
+  }
+
+  function normalizePhotoList(list, kind) {
+    if (!Array.isArray(list)) return [];
+    return list
+      .slice(0, MAX_PHOTOS_PER_TYPE)
+      .map(p => normalizePhotoItem(p, kind))
+      .filter(Boolean);
+  }
+
+  function buildDriveLinksFromPhotos(condPhotos, beforePhotos, afterPhotos, fallbackLinks = {}) {
+    const extractUrls = (arr, fbArr) => {
+      const fromPhotos = (arr || [])
+        .map(p => {
+          const norm = normalizePhotoItem(p);
+          return norm ? (norm.driveUrl || norm.url || '') : '';
+        })
+        .filter(u => u && !u.startsWith('data:'));
+      if (fromPhotos.length > 0) return fromPhotos;
+      return Array.isArray(fbArr) ? fbArr.filter(Boolean) : [];
+    };
+    return {
+      condition: extractUrls(condPhotos, fallbackLinks.condition),
+      before: extractUrls(beforePhotos, fallbackLinks.before),
+      after: extractUrls(afterPhotos, fallbackLinks.after)
+    };
+  }
+
+  function hydratePhotosFromDriveLinks(photos, links, kind) {
+    const existing = normalizePhotoList(photos, kind);
+    if (existing.length > 0) return existing;
+    if (!Array.isArray(links) || links.length === 0) return [];
+    return links
+      .slice(0, MAX_PHOTOS_PER_TYPE)
+      .map(link => normalizePhotoItem(link, kind))
+      .filter(Boolean);
+  }
 
   function setupPwaAssets() {
     try {
@@ -1276,6 +1407,16 @@
     }
   } catch (e) {}
 
+  function postToBackend(payload) {
+    const url = (state.config.syncEndpoint || '').trim();
+    if (!url) return Promise.resolve(null);
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(res => res.json());
+  }
+
   function parseRemoteVehicleList(data) {
     if (Array.isArray(data)) return data;
     if (data && Array.isArray(data.vehicles)) return data.vehicles;
@@ -1286,7 +1427,7 @@
   function fetchRemoteVehicles({ silent = false, customUrl = '' } = {}) {
     const url = (customUrl || state.config.syncEndpoint || '').trim();
     if (!url) {
-      if (!silent) showToast('먼저 원격 동기화 Endpoint URL을 입력하세요.');
+      if (!silent) showToast('먼저 구글 앱스 스크립트 웹앱 URL을 입력하세요.');
       return;
     }
     if (isSyncingRemote) return;
@@ -1306,7 +1447,7 @@
         state.vehicles = normalizeVehicles(list);
         saveStorage(false);
         renderAll();
-        if (!silent) showToast(`원격 데이터를 불러왔습니다. (${state.vehicles.length}대)`);
+        if (!silent) showToast(`시트/드라이브 데이터를 불러왔습니다. (${state.vehicles.length}대)`);
       })
       .catch(() => {
         if (!silent) showToast('원격 데이터 불러오기에 실패했습니다.');
@@ -1314,6 +1455,27 @@
       .finally(() => {
         isSyncingRemote = false;
       });
+  }
+
+  function pushAllVehiclesToRemote() {
+    const url = (state.config.syncEndpoint || '').trim();
+    if (!url) {
+      showToast('먼저 구글 앱스 스크립트 웹앱 URL을 입력하세요.');
+      return;
+    }
+    const preparedVehicles = state.vehicles.map(v => {
+      const dl = buildDriveLinksFromPhotos(v.conditionPhotos, v.beforePhotos, v.afterPhotos, v.driveLinks);
+      return { ...v, driveLinks: dl };
+    });
+    postToBackend({ action: 'syncAll', vehicles: preparedVehicles })
+      .then(res => {
+        if (res && res.ok) {
+          showToast(`시트에 ${res.count ?? preparedVehicles.length}대 전체 동기화 완료`);
+        } else {
+          showToast((res && res.error) || '전체 동기화에 실패했습니다.');
+        }
+      })
+      .catch(() => showToast('원격 동기화 요청 중 오류가 발생했습니다.'));
   }
 
   function sanitizePartnerName(name) {
@@ -1353,17 +1515,35 @@
   }
 
   function normalizeVehicles(list) {
-    return (list || []).map(v => ({
-      ...v,
-      partner: sanitizePartnerName(v.partner),
-      tech: sanitizeTechName(v.tech),
-      status: v.status === '정비·도장 진행' ? '판금 진행' : (v.status || '입고·견적 대기'),
-      insurance: v.insurance || '',
-      damages: Array.isArray(v.damages) ? v.damages : [],
-      conditionPhotos: Array.isArray(v.conditionPhotos) ? v.conditionPhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
-      beforePhotos: Array.isArray(v.beforePhotos) ? v.beforePhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
-      afterPhotos: Array.isArray(v.afterPhotos) ? v.afterPhotos.slice(0, MAX_PHOTOS_PER_TYPE) : []
-    }));
+    return (list || []).map(v => {
+      const dl = v.driveLinks || {};
+      const condLinks = Array.isArray(dl.condition) ? dl.condition : [];
+      const beforeLinks = Array.isArray(dl.before) ? dl.before : [];
+      const afterLinks = Array.isArray(dl.after) ? dl.after : [];
+
+      const condPhotos = hydratePhotosFromDriveLinks(v.conditionPhotos, condLinks, 'condition');
+      const beforePhotos = hydratePhotosFromDriveLinks(v.beforePhotos, beforeLinks, 'before');
+      const afterPhotos = hydratePhotosFromDriveLinks(v.afterPhotos, afterLinks, 'after');
+
+      return {
+        ...v,
+        partner: sanitizePartnerName(v.partner),
+        tech: sanitizeTechName(v.tech),
+        status: v.status === '정비·도장 진행' ? '판금 진행' : (v.status || '입고·견적 대기'),
+        insurance: v.insurance || '',
+        damages: Array.isArray(v.damages) ? v.damages : [],
+        conditionPhotos: condPhotos,
+        beforePhotos: beforePhotos,
+        afterPhotos: afterPhotos,
+        driveLinks: buildDriveLinksFromPhotos(condPhotos, beforePhotos, afterPhotos, {
+          condition: condLinks,
+          before: beforeLinks,
+          after: afterLinks
+        }),
+        createdAt: v.createdAt || nowFormatted(),
+        updatedAt: v.updatedAt || v.createdAt || nowFormatted()
+      };
+    });
   }
 
   function loadStorage() {
@@ -1399,7 +1579,17 @@
     } catch (e) {}
 
     try {
-      const rawData = JSON.parse(safeGetItem(STORAGE_KEY) || 'null');
+      let rawStr = safeGetItem(STORAGE_KEY);
+      if (!rawStr) {
+        for (const k of LEGACY_STORAGE_KEYS) {
+          const legacy = safeGetItem(k);
+          if (legacy) {
+            rawStr = legacy;
+            break;
+          }
+        }
+      }
+      const rawData = JSON.parse(rawStr || 'null');
       if (Array.isArray(rawData) && rawData.length > 0) {
         state.vehicles = normalizeVehicles(rawData);
       } else {
@@ -1427,7 +1617,7 @@
     el.textContent = msg;
     el.classList.add('show');
     clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2500);
+    window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
   }
 
   function setStatusFilter(status) {
@@ -1539,9 +1729,9 @@
     const syncBadge = document.getElementById('syncStatusBadge');
 
     if (state.config.syncEndpoint) {
-      syncBadge.textContent = '☁️ 원격 동기화 연결됨';
+      syncBadge.textContent = '📁 구글 드라이브 연동됨';
     } else {
-      syncBadge.textContent = '⚡ 동기화 준비됨';
+      syncBadge.textContent = '⚠️ 웹앱 URL 미설정';
     }
 
     const syncBtn = document.getElementById('btnSyncCode');
@@ -1588,16 +1778,20 @@
         : '';
 
       const thumbs = [
-        ...(v.conditionPhotos || []).map((src, i) => ({ src, label: '컨디션', cls: 'cond', kind: 'condition', idx: i })),
-        ...(v.beforePhotos || []).map((src, i) => ({ src, label: '작업전', cls: '', kind: 'before', idx: i })),
-        ...(v.afterPhotos || []).map((src, i) => ({ src, label: '작업후', cls: '', kind: 'after', idx: i }))
+        ...(v.conditionPhotos || []).map((p, i) => ({ item: p, label: '컨디션', cls: 'cond', kind: 'condition', idx: i })),
+        ...(v.beforePhotos || []).map((p, i) => ({ item: p, label: '작업전', cls: '', kind: 'before', idx: i })),
+        ...(v.afterPhotos || []).map((p, i) => ({ item: p, label: '작업후', cls: '', kind: 'after', idx: i }))
       ];
       const photoHtml = thumbs.length
-        ? `<div class="v-photos-preview">${thumbs.map(t => `
-            <div class="thumb-box" data-view-vid="${escapeHtml(v.id)}" data-view-kind="${t.kind}" data-view-idx="${t.idx}">
-              <img src="${t.src}" alt="${t.label}">
-              <span class="thumb-tag ${t.cls}">${t.label}</span>
-            </div>`).join('')}</div>`
+        ? `<div class="v-photos-preview">${thumbs.map(t => {
+            const norm = normalizePhotoItem(t.item, t.kind);
+            if (!norm) return '';
+            return `
+              <div class="thumb-box" data-view-vid="${escapeHtml(v.id)}" data-view-kind="${t.kind}" data-view-idx="${t.idx}">
+                <img src="${escapeHtml(norm.thumbUrl || norm.url)}" alt="${t.label}" loading="lazy">
+                <span class="thumb-tag ${t.cls}">${t.label}</span>
+              </div>`;
+          }).join('')}</div>`
         : '';
 
       return `
@@ -1662,6 +1856,40 @@
     showToast('필터가 초기화되었습니다.');
   }
 
+  function clearUploadStatuses() {
+    ['conditionUploadStatus', 'beforeUploadStatus', 'afterUploadStatus'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = '';
+        el.style.display = 'none';
+      }
+    });
+  }
+
+  function setUploadStatus(kind, text) {
+    const map = {
+      condition: 'conditionUploadStatus',
+      before: 'beforeUploadStatus',
+      after: 'afterUploadStatus'
+    };
+    const el = document.getElementById(map[kind]);
+    if (!el) return;
+    if (text) {
+      el.textContent = text;
+      el.style.display = 'block';
+    } else {
+      el.textContent = '';
+      el.style.display = 'none';
+    }
+  }
+
+  function updateSubmitLock() {
+    const btn = document.getElementById('btnSaveVehicleSubmit');
+    if (!btn) return;
+    btn.disabled = state.uploadingCount > 0;
+    btn.textContent = state.uploadingCount > 0 ? '드라이브 업로드 중...' : '저장하기';
+  }
+
   function openCreateModal() {
     if (state.config.role === 'PARTNER') {
       showToast('거래처 전용 모드는 읽기 전용입니다.');
@@ -1675,6 +1903,9 @@
     state.tempBeforePhotos = [];
     state.tempAfterPhotos = [];
     state.tempDamages = [];
+    state.uploadingCount = 0;
+    updateSubmitLock();
+    clearUploadStatuses();
     renderDamagePicker();
     renderPhotoPreviews();
     setVehicleModalReadOnly(false);
@@ -1738,10 +1969,14 @@
     document.getElementById('fEstimate').value = v.estimate || '';
     document.getElementById('fMemo').value = v.memo || '';
 
-    state.tempConditionPhotos = [...(v.conditionPhotos || [])];
-    state.tempBeforePhotos = [...(v.beforePhotos || [])];
-    state.tempAfterPhotos = [...(v.afterPhotos || [])];
+    const dl = v.driveLinks || {};
+    state.tempConditionPhotos = hydratePhotosFromDriveLinks(v.conditionPhotos, dl.condition, 'condition');
+    state.tempBeforePhotos = hydratePhotosFromDriveLinks(v.beforePhotos, dl.before, 'before');
+    state.tempAfterPhotos = hydratePhotosFromDriveLinks(v.afterPhotos, dl.after, 'after');
     state.tempDamages = [...(v.damages || [])];
+    state.uploadingCount = 0;
+    updateSubmitLock();
+    clearUploadStatuses();
     renderDamagePicker();
     renderPhotoPreviews();
     setVehicleModalReadOnly(isPartnerReadOnly);
@@ -1760,52 +1995,132 @@
     return state.tempAfterPhotos;
   }
 
-  function compressImage(file, callback) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const maxW = 720;
-        const scale = img.width > maxW ? maxW / img.width : 1;
-        const canvas = document.createElement('canvas');
-        canvas.width = Math.max(1, Math.round(img.width * scale));
-        canvas.height = Math.max(1, Math.round(img.height * scale));
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        callback(canvas.toDataURL('image/jpeg', 0.65));
+  function prepareImageForDrive(file) {
+    return new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const dataUrl = e.target.result;
+        const img = new Image();
+        img.onload = () => {
+          const maxW = 1280;
+          const scale = img.width > maxW ? maxW / img.width : 1;
+          const canvas = document.createElement('canvas');
+          canvas.width = Math.max(1, Math.round(img.width * scale));
+          canvas.height = Math.max(1, Math.round(img.height * scale));
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.78);
+          resolve({
+            base64Data: compressedDataUrl,
+            previewDataUrl: compressedDataUrl
+          });
+        };
+        img.onerror = () => {
+          resolve({
+            base64Data: dataUrl,
+            previewDataUrl: dataUrl
+          });
+        };
+        img.src = dataUrl;
       };
-      img.onerror = () => callback(e.target.result);
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
+      reader.readAsDataURL(file);
+    });
   }
 
-  function handlePhotoUpload(event, kind) {
+  /* 백엔드 uploadPhotoToDrive_ 규격(base64Data, fileName)에 맞춰 전송 */
+  async function uploadSinglePhotoToDrive(prepared, kind, plate, index) {
+    const endpoint = (state.config.syncEndpoint || '').trim();
+    if (!endpoint) {
+      throw new Error('구글 앱스 스크립트 웹앱 URL이 설정되어 있지 않습니다.');
+    }
+
+    const safePlate = String(plate || '차량미상').replace(/[\\/:*?"<>|\s]+/g, '_');
+    const stamp = Date.now() + '_' + (index + 1);
+    const fileName = `${safePlate}_${kind}_${stamp}.jpg`;
+
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({
+        action: 'uploadPhoto',
+        fileName: fileName,
+        base64Data: prepared.base64Data
+      })
+    });
+
+    const data = await res.json();
+    if (!data || data.ok === false || (!data.url && !data.thumbUrl)) {
+      throw new Error((data && data.error) || '드라이브 업로드 실패');
+    }
+
+    const fileId = data.id || extractDriveFileId(data.url || data.thumbUrl || '');
+    return normalizePhotoItem({
+      id: fileId,
+      name: fileName,
+      kind: kind,
+      url: data.url || data.thumbUrl,
+      thumbUrl: data.thumbUrl || buildThumbFromIdOrUrl(fileId, data.url),
+      driveUrl: data.url || ''
+    }, kind);
+  }
+
+  async function handlePhotoUpload(event, kind) {
     const files = Array.from(event.target.files || []);
+    event.target.value = '';
+    if (!files.length) return;
+
+    const endpoint = (state.config.syncEndpoint || '').trim();
+    if (!endpoint) {
+      showToast('먼저 [동기화·코드]에서 구글 앱스 스크립트 웹앱 URL을 설정해 주세요.');
+      return;
+    }
+
     const targetArr = getTempPhotoArray(kind);
     const remaining = MAX_PHOTOS_PER_TYPE - targetArr.length;
 
     if (remaining <= 0) {
       showToast(`최대 ${MAX_PHOTOS_PER_TYPE}장까지만 등록할 수 있습니다.`);
-      event.target.value = '';
       return;
     }
 
     const sliceFiles = files.slice(0, remaining);
     if (files.length > remaining) {
-      showToast(`최대 ${MAX_PHOTOS_PER_TYPE}장 한도로 ${sliceFiles.length}장만 추가됩니다.`);
+      showToast(`최대 ${MAX_PHOTOS_PER_TYPE}장 한도로 ${sliceFiles.length}장만 업로드합니다.`);
     }
 
-    sliceFiles.forEach(file => {
-      compressImage(file, (dataUrl) => {
+    const plate = (document.getElementById('fPlate').value || '').trim() || '차량미상';
+    state.uploadingCount += sliceFiles.length;
+    updateSubmitLock();
+
+    let successCount = 0;
+    let failCount = 0;
+
+    for (let i = 0; i < sliceFiles.length; i++) {
+      setUploadStatus(kind, `구글 드라이브 업로드 중... (${i + 1}/${sliceFiles.length})`);
+      try {
+        const prepared = await prepareImageForDrive(sliceFiles[i]);
+        const uploadedItem = await uploadSinglePhotoToDrive(prepared, kind, plate, i);
         const arr = getTempPhotoArray(kind);
-        if (arr.length < MAX_PHOTOS_PER_TYPE) {
-          arr.push(dataUrl);
+        if (arr.length < MAX_PHOTOS_PER_TYPE && uploadedItem) {
+          arr.push(uploadedItem);
+          successCount++;
           renderPhotoPreviews();
         }
-      });
-    });
-    event.target.value = '';
+      } catch (err) {
+        failCount++;
+      } finally {
+        state.uploadingCount = Math.max(0, state.uploadingCount - 1);
+        updateSubmitLock();
+      }
+    }
+
+    if (failCount === 0) {
+      setUploadStatus(kind, `✓ 구글 드라이브(ACRO_차량사진)에 ${successCount}장 저장 완료`);
+      showToast(`구글 드라이브에 ${successCount}장이 업로드되었습니다.`);
+    } else {
+      setUploadStatus(kind, `성공 ${successCount}장 / 실패 ${failCount}장 (웹앱 배포 권한 확인 필요)`);
+      showToast(`일부 사진(${failCount}장) 업로드에 실패했습니다.`);
+    }
   }
 
   function renderPhotoPreviews() {
@@ -1813,12 +2128,16 @@
     document.getElementById('beforeCountBadge').textContent = `${state.tempBeforePhotos.length} / ${MAX_PHOTOS_PER_TYPE}장`;
     document.getElementById('afterCountBadge').textContent = `${state.tempAfterPhotos.length} / ${MAX_PHOTOS_PER_TYPE}장`;
 
-    const renderGrid = (arr, kind, altText) => arr.map((src, idx) => `
-      <div class="photo-item">
-        <img src="${src}" alt="${altText}">
-        <button type="button" class="photo-del" data-del-kind="${kind}" data-del-idx="${idx}">✕</button>
-      </div>
-    `).join('');
+    const renderGrid = (arr, kind, altText) => arr.map((p, idx) => {
+      const norm = normalizePhotoItem(p, kind);
+      if (!norm) return '';
+      return `
+        <div class="photo-item">
+          <img src="${escapeHtml(norm.thumbUrl || norm.url)}" alt="${altText}" loading="lazy">
+          <button type="button" class="photo-del" data-del-kind="${kind}" data-del-idx="${idx}">✕</button>
+        </div>
+      `;
+    }).join('');
 
     document.getElementById('conditionPhotoPreview').innerHTML = renderGrid(state.tempConditionPhotos, 'condition', '컨디션 체크');
     document.getElementById('beforePhotoPreview').innerHTML = renderGrid(state.tempBeforePhotos, 'before', '작업전');
@@ -1837,7 +2156,24 @@
       showToast('거래처 전용 모드는 읽기 전용입니다.');
       return;
     }
+    if (state.uploadingCount > 0) {
+      showToast('사진 업로드가 끝난 뒤 저장해 주세요.');
+      return;
+    }
+
     const id = document.getElementById('editVehicleId').value;
+    const existing = id ? state.vehicles.find(v => v.id === id) : null;
+    const condPhotos = normalizePhotoList(state.tempConditionPhotos, 'condition');
+    const beforePhotos = normalizePhotoList(state.tempBeforePhotos, 'before');
+    const afterPhotos = normalizePhotoList(state.tempAfterPhotos, 'after');
+    const driveLinks = buildDriveLinksFromPhotos(
+      condPhotos,
+      beforePhotos,
+      afterPhotos,
+      existing ? existing.driveLinks : {}
+    );
+
+    const nowStr = nowFormatted();
     const payload = {
       id: id || ('v-' + Date.now()),
       partner: sanitizePartnerName(document.getElementById('fPartner').value),
@@ -1856,10 +2192,12 @@
       estimate: document.getElementById('fEstimate').value.trim(),
       damages: [...state.tempDamages],
       memo: document.getElementById('fMemo').value.trim(),
-      conditionPhotos: state.tempConditionPhotos.slice(0, MAX_PHOTOS_PER_TYPE),
-      beforePhotos: state.tempBeforePhotos.slice(0, MAX_PHOTOS_PER_TYPE),
-      afterPhotos: state.tempAfterPhotos.slice(0, MAX_PHOTOS_PER_TYPE),
-      createdAt: id ? ((state.vehicles.find(v => v.id === id) || {}).createdAt || new Date().toISOString().slice(0, 16).replace('T', ' ')) : new Date().toISOString().slice(0, 16).replace('T', ' ')
+      conditionPhotos: condPhotos,
+      beforePhotos: beforePhotos,
+      afterPhotos: afterPhotos,
+      driveLinks: driveLinks,
+      createdAt: existing ? (existing.createdAt || nowStr) : nowStr,
+      updatedAt: nowStr
     };
 
     if (id) {
@@ -1873,14 +2211,36 @@
     saveStorage(true);
     closeModal('vehicleModal');
     renderAll();
+
+    if ((state.config.syncEndpoint || '').trim()) {
+      postToBackend({ action: 'upsertVehicle', vehicle: payload })
+        .catch(() => showToast('로컬에는 저장되었으나 시트 전송에 실패했습니다.'));
+    }
   }
 
   function quickStatusChange(id, newStatus) {
     if (state.config.role === 'PARTNER') return;
-    state.vehicles = state.vehicles.map(v => v.id === id ? { ...v, status: newStatus } : v);
+    let updatedItem = null;
+    const nowStr = nowFormatted();
+    state.vehicles = state.vehicles.map(v => {
+      if (v.id === id) {
+        updatedItem = {
+          ...v,
+          status: newStatus,
+          updatedAt: nowStr,
+          driveLinks: buildDriveLinksFromPhotos(v.conditionPhotos, v.beforePhotos, v.afterPhotos, v.driveLinks)
+        };
+        return updatedItem;
+      }
+      return v;
+    });
     saveStorage(true);
     renderAll();
     showToast(`공정이 '${newStatus}'(으)로 변경되었습니다.`);
+
+    if (updatedItem && (state.config.syncEndpoint || '').trim()) {
+      postToBackend({ action: 'upsertVehicle', vehicle: updatedItem }).catch(() => {});
+    }
   }
 
   function deleteVehicle(id) {
@@ -1890,6 +2250,10 @@
     saveStorage(true);
     renderAll();
     showToast('삭제되었습니다.');
+
+    if ((state.config.syncEndpoint || '').trim()) {
+      postToBackend({ action: 'deleteVehicle', id: id }).catch(() => {});
+    }
   }
 
   function copyCustomerSms(id) {
@@ -2047,7 +2411,7 @@
     saveStorage(false);
     renderAll();
     closeModal('syncModal');
-    showToast(state.config.syncEndpoint ? '원격 주소 및 관리자 PIN이 저장되었습니다.' : '설정이 저장되었습니다.');
+    showToast(state.config.syncEndpoint ? '웹앱 URL 및 관리자 PIN이 저장되었습니다.' : '설정이 저장되었습니다.');
   }
 
   function pullFromRemoteEndpoint() {
@@ -2105,11 +2469,24 @@
   function viewCardPhoto(vehicleId, kind, idx) {
     const v = state.vehicles.find(item => item.id === vehicleId);
     if (!v) return;
-    const arr = kind === 'condition' ? v.conditionPhotos : (kind === 'before' ? v.beforePhotos : v.afterPhotos);
+    const rawArr = kind === 'condition' ? v.conditionPhotos : (kind === 'before' ? v.beforePhotos : v.afterPhotos);
     const label = kind === 'condition' ? '차량 컨디션 체크' : (kind === 'before' ? '작업전' : '작업후');
-    if (!arr || !arr[idx]) return;
-    document.getElementById('photoViewerTitle').textContent = `${v.plate} · ${label} (${idx + 1}/${arr.length})`;
-    document.getElementById('photoViewerImg').src = arr[idx];
+    if (!rawArr || !rawArr[idx]) return;
+    const norm = normalizePhotoItem(rawArr[idx], kind);
+    if (!norm) return;
+
+    document.getElementById('photoViewerTitle').textContent = `${v.plate} · ${label} (${idx + 1}/${rawArr.length})`;
+    document.getElementById('photoViewerImg').src = norm.thumbUrl || norm.url;
+
+    const wrap = document.getElementById('photoViewerDriveWrap');
+    const link = document.getElementById('photoViewerDriveLink');
+    if (norm.driveUrl && norm.driveUrl.startsWith('http')) {
+      link.href = norm.driveUrl;
+      wrap.style.display = 'block';
+    } else {
+      wrap.style.display = 'none';
+    }
+
     const m = document.getElementById('photoViewerModal');
     if (m) { m.classList.add('open'); m.style.display = 'flex'; }
   }
@@ -2190,6 +2567,7 @@
     document.getElementById('btnSwitchPartner').addEventListener('click', () => switchToPartner());
     document.getElementById('btnSaveSync').addEventListener('click', saveSyncEndpoint);
     document.getElementById('btnPullRemote').addEventListener('click', pullFromRemoteEndpoint);
+    document.getElementById('btnPushAllRemote').addEventListener('click', pushAllVehiclesToRemote);
     document.getElementById('btnExportJson').addEventListener('click', exportBackupJson);
     document.getElementById('btnImportJsonTrigger').addEventListener('click', () => {
       document.getElementById('importJsonInput').click();
