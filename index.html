@@ -721,7 +721,7 @@
         <div class="brand-title-row">
           <span class="brand-name">아크로 공업사</span>
           <span id="modeBadge" class="mode-pill">관리자 모드</span>
-          <span id="syncStatusBadge" class="sync-pill">⚡ 실시간 동기화 준비됨</span>
+          <span id="syncStatusBadge" class="sync-pill">☁️ 시트·드라이브 연결됨</span>
         </div>
         <p class="brand-desc">수입·국산 종합정비 · 판금·열처리 도장 · 보험수리 · 대차 실시간 관리 포털</p>
       </div>
@@ -996,7 +996,7 @@
       <button type="button" class="small" data-close-modal="syncModal">닫기 ✕</button>
     </div>
     <p class="brand-desc" style="white-space:normal; margin-bottom:10px;">
-      Google Apps Script 웹 앱(<code>.../exec</code>) URL을 저장하면 사진은 <strong>구글 드라이브</strong>에 업로드되고 차량 데이터는 <strong>구글 시트</strong>와 10초마다 자동 동기화됩니다.
+      Google Apps Script 웹 앱(<code>.../exec</code>) URL이 기본 연결되어 있습니다. 사진은 <strong>구글 드라이브</strong>에 업로드되고 차량 데이터는 <strong>구글 시트</strong>와 10초마다 자동 동기화됩니다.
     </p>
     <div class="filter-row two form-group">
       <div>
@@ -1054,7 +1054,7 @@
   const CHANNEL_NAME = 'ACRO_MOTORS_SYNC_FINAL_V1';
   const MAX_PHOTOS_PER_TYPE = 30;
   const DEFAULT_ADMIN_PIN = 'ACRO-0000';
-  const DEFAULT_SYNC_ENDPOINT = '';
+  const DEFAULT_SYNC_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzbKeQCD6F5PJX_9SwippkPyaTJZU71q1XbR12GpjcZT43v_ecla1Z55544Lfw1sVT6zA/exec';
 
   const memoryStore = {
     [STORAGE_KEY]: null,
@@ -1288,7 +1288,7 @@
   }
 
   function fetchRemoteVehicles({ silent = false, customUrl = '' } = {}) {
-    const url = (customUrl || state.config.syncEndpoint || '').trim();
+    const url = (customUrl || state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
     if (!url) {
       if (!silent) showToast('먼저 Google Apps Script 웹 앱(..../exec) URL을 입력하세요.');
       return;
@@ -1415,10 +1415,15 @@
       const rawConfig = JSON.parse(safeGetItem(CONFIG_KEY) || '{}');
       const hasCustomEndpoint = Object.prototype.hasOwnProperty.call(rawConfig, 'syncEndpoint') && String(rawConfig.syncEndpoint || '').trim().length > 0;
       const savedEndpoint = hasCustomEndpoint ? String(rawConfig.syncEndpoint).trim() : DEFAULT_SYNC_ENDPOINT;
+      // 이전 구버전 배포 URL이 로컬스토리지에 남아있을 경우 최신 배포 URL로 자동 업그레이드
+      const legacyUrl = 'https://script.google.com/macros/s/AKfycbyAkLQcqxVU66stG-tB-zvtWxgEuE2G_YXywRKdqg7CO-ixsenyuVzM2LENjZEoFSO7YA/exec';
+      const resolvedEndpoint = (savedEndpoint === legacyUrl || savedEndpoint.indexOf('/macros/echo') !== -1)
+        ? DEFAULT_SYNC_ENDPOINT
+        : savedEndpoint;
       state.config = {
         role: rawConfig.role === 'PARTNER' ? 'PARTNER' : 'ADMIN',
         activePartner: sanitizePartnerName(rawConfig.activePartner || ''),
-        syncEndpoint: savedEndpoint.indexOf('/macros/echo') === -1 ? savedEndpoint : '',
+        syncEndpoint: resolvedEndpoint,
         adminPin: rawConfig.adminPin || DEFAULT_ADMIN_PIN,
         lockedPartner: !!rawConfig.lockedPartner
       };
@@ -1459,7 +1464,7 @@
   }
 
   function postToGas(payload) {
-    const url = (state.config.syncEndpoint || '').trim();
+    const url = (state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
     if (!url || url.indexOf('/macros/echo') !== -1) return Promise.resolve(null);
     return fetch(url, {
       method: 'POST',
@@ -1492,7 +1497,7 @@
   }
 
   function pushAllVehiclesToGas() {
-    const url = (state.config.syncEndpoint || '').trim();
+    const url = (state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
     if (!url) {
       showToast('먼저 Google Apps Script 웹 앱(..../exec) URL을 입력하세요.');
       return;
@@ -1509,7 +1514,7 @@
   }
 
   async function uploadPhotosToDrive(record) {
-    const url = (state.config.syncEndpoint || '').trim();
+    const url = (state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
     if (!url || url.indexOf('/macros/echo') !== -1) return record;
 
     const kinds = [
@@ -1547,7 +1552,7 @@
             base64Data: src
           });
           if (res && res.ok && res.url) {
-            driveLinks[item.linkKey][i] = res.url;
+            driveLinks[item.linkKey].push(res.url);
             uploadedCount++;
           } else {
             nextPhotos[item.photoKey].push(src);
@@ -1560,6 +1565,12 @@
 
     if (uploadedCount > 0) {
       showToast(`구글 드라이브에 사진 ${uploadedCount}장 저장 완료`);
+    } else if (
+      (record.conditionPhotos?.length || 0) +
+      (record.beforePhotos?.length || 0) +
+      (record.afterPhotos?.length || 0) > 0
+    ) {
+      showToast('Apps Script에 uploadPhoto 코드/새 버전 배포가 필요합니다.');
     }
 
     return {
@@ -1577,7 +1588,7 @@
     el.textContent = msg;
     el.classList.add('show');
     clearTimeout(window.__toastTimer);
-    window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
+    window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2800);
   }
 
   function setStatusFilter(status) {
@@ -2229,7 +2240,7 @@
       requestAdminMode();
       return;
     }
-    document.getElementById('syncEndpointInput').value = state.config.syncEndpoint || '';
+    document.getElementById('syncEndpointInput').value = state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT;
     document.getElementById('adminPinSettingInput').value = state.config.adminPin || DEFAULT_ADMIN_PIN;
     renderPartnerCodeTable();
     const m = document.getElementById('syncModal');
@@ -2245,7 +2256,7 @@
       showToast('구글 시트 배포용 /exec URL을 입력해 주세요.');
       return;
     }
-    state.config.syncEndpoint = inputUrl;
+    state.config.syncEndpoint = inputUrl || DEFAULT_SYNC_ENDPOINT;
     const newAdminPin = (document.getElementById('adminPinSettingInput').value || '').trim();
     if (newAdminPin) {
       state.config.adminPin = newAdminPin;
@@ -2254,11 +2265,11 @@
     renderAll();
     closeModal('syncModal');
     startAutoRemoteSync();
-    showToast(state.config.syncEndpoint ? '구글 시트·드라이브 동기화 설정이 저장되었습니다.' : '설정이 저장되었습니다.');
+    showToast('구글 시트·드라이브 동기화 설정이 저장되었습니다.');
   }
 
   function pullFromRemoteEndpoint() {
-    const inputUrl = (document.getElementById('syncEndpointInput').value || state.config.syncEndpoint || '').trim();
+    const inputUrl = (document.getElementById('syncEndpointInput').value || state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
     fetchRemoteVehicles({ silent: false, customUrl: inputUrl });
   }
 
