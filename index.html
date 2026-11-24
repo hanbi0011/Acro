@@ -2652,7 +2652,7 @@
   loadStorage();
   bindEvents();
   renderAll();
+  if ((state.config.syncEndpoint || '').trim()) {
+    fetchRemoteVehicles({ silent: true, customUrl: state.config.syncEndpoint });
+  }
 })();
-</script>
-</body>
-</html>
