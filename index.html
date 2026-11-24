@@ -4,7 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="theme-color" content="#111827">
+<meta name="application-name" content="ACRO 공업사">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ACRO 공업사">
 <title>ACRO MOTORS · 아크로 공업사 차량 입고·정비 관리</title>
+<link id="appleTouchIconLink" rel="apple-touch-icon" href="">
+<link id="manifestLink" rel="manifest" href="">
 <style>
   :root {
     --bg: #f3f4f6;
@@ -27,72 +34,373 @@
     --radius-sm: 10px;
     --shadow: 0 2px 10px rgba(0,0,0,0.05);
   }
-  * { box-sizing: border-box; -webkit-tap-highlight-color: rgba(37, 99, 235, 0.22); }
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: rgba(37, 99, 235, 0.22);
+  }
   html, body {
-    margin: 0; padding: 0; background: var(--bg); color: var(--ink);
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", "Malgun Gothic", sans-serif;
-    font-size: 14px; line-height: 1.45; overflow-x: hidden;
+    font-size: 14px;
+    line-height: 1.45;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+    position: relative;
   }
-  .app-wrap { max-width: 980px; margin: 0 auto; padding: 12px; padding-bottom: 92px; }
-  .top-header, .stat-card, .filter-card, .v-card {
-    background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow);
+  .app-wrap {
+    max-width: 980px;
+    margin: 0 auto;
+    padding: 12px;
+    padding-bottom: 92px;
+    position: relative;
+    z-index: 1;
   }
-  .top-header { padding: 12px; margin-bottom: 12px; }
-  .brand-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .acro-box {
-    background: #111827; color: #fff; padding: 6px 10px; border-radius: 8px; text-align: center; line-height: 1.1; flex-shrink: 0;
-  }
-  .acro-box .en { display: block; font-weight: 900; font-size: 14px; letter-spacing: 0.06em; color: #ef4444; }
-  .acro-box .sub { display: block; font-weight: 700; font-size: 9px; letter-spacing: 0.12em; color: #e5e7eb; margin-top: 2px; }
-  .brand-title-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-  .brand-name { font-size: 16px; font-weight: 800; }
-  .mode-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); border: 1px solid #bfdbfe; }
-  .mode-pill.partner { background: var(--warn-soft); color: var(--warn); border-color: #fde68a; }
-  .sync-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; background: var(--ok-soft); color: var(--ok); border: 1px solid #a7f3d0; }
-  .brand-desc { margin: 3px 0 0 0; font-size: 11.5px; color: var(--muted); }
-  .btn-row-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; margin-bottom: 7px; }
-  .btn-row-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 7px; }
 
-  button, select, input, textarea { font-family: inherit; font-size: 14px; max-width: 100%; }
+  /* Header Card */
+  .top-header {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  .brand-top {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    min-width: 0;
+  }
+  .acro-box {
+    background: #111827;
+    color: #ffffff;
+    padding: 6px 10px;
+    border-radius: 8px;
+    text-align: center;
+    line-height: 1.1;
+    flex-shrink: 0;
+  }
+  .acro-box .en {
+    display: block;
+    font-weight: 900;
+    font-size: 14px;
+    letter-spacing: 0.06em;
+    color: #ef4444;
+  }
+  .acro-box .sub {
+    display: block;
+    font-weight: 700;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: #e5e7eb;
+    margin-top: 2px;
+  }
+  .brand-info {
+    min-width: 0;
+    flex: 1;
+  }
+  .brand-title-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+  .brand-name {
+    font-size: 16px;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .mode-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    border: 1px solid #bfdbfe;
+  }
+  .mode-pill.partner {
+    background: var(--warn-soft);
+    color: var(--warn);
+    border-color: #fde68a;
+  }
+  .sync-pill {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--ok-soft);
+    color: var(--ok);
+    border: 1px solid #a7f3d0;
+  }
+  .brand-desc {
+    margin: 3px 0 0 0;
+    font-size: 11.5px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .btn-row-3 {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 7px;
+    margin-bottom: 7px;
+    position: relative;
+    z-index: 3;
+  }
+  .btn-row-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    position: relative;
+    z-index: 3;
+  }
+
+  button, select, input, textarea {
+    font-family: inherit;
+    font-size: 14px;
+    max-width: 100%;
+  }
   button {
-    border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: var(--radius-sm);
-    padding: 8px 10px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-    gap: 5px; min-height: 42px; font-size: 12.5px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    font-weight: 700;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-height: 42px;
+    font-size: 12.5px;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    pointer-events: auto;
+    position: relative;
+    z-index: 4;
   }
   button:disabled { opacity: 0.55; cursor: not-allowed; }
-  button.primary { background: var(--primary); color: var(--primary-ink); border-color: var(--primary); }
-  button.accent { background: var(--accent); color: #fff; border-color: var(--accent); }
-  button.soft-gray { background: #f3f4f6; color: #1f2937; }
-  button.danger-soft { background: var(--danger-soft); color: var(--danger); border-color: #fecaca; }
-  button.small { min-height: 36px; padding: 5px 9px; font-size: 12px; }
+  button:active { transform: scale(0.99); opacity: 0.9; }
+  button.primary {
+    background: var(--primary);
+    color: var(--primary-ink);
+    border-color: var(--primary);
+  }
+  button.accent {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+  }
+  button.soft-gray {
+    background: #f3f4f6;
+    color: #1f2937;
+    border-color: #e5e7eb;
+  }
+  button.danger-soft {
+    background: var(--danger-soft);
+    color: var(--danger);
+    border-color: #fecaca;
+  }
+  button.small {
+    min-height: 36px;
+    padding: 5px 9px;
+    font-size: 12px;
+  }
 
   input[type="text"], input[type="tel"], input[type="date"], input[type="password"], select, textarea {
-    width: 100%; border: 1px solid #d1d5db; background: #fff; color: var(--ink); border-radius: var(--radius-sm); padding: 9px 11px; min-height: 42px;
+    width: 100%;
+    border: 1px solid #d1d5db;
+    background: #fff;
+    color: var(--ink);
+    border-radius: var(--radius-sm);
+    padding: 9px 11px;
+    min-height: 42px;
+    outline: none;
   }
-  textarea { min-height: 76px; resize: vertical; }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+  }
+  textarea {
+    min-height: 76px;
+    resize: vertical;
+  }
 
-  .stats-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
-  @media (min-width: 720px) { .stats-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
-  .stat-card { padding: 13px 14px; cursor: pointer; }
-  .stat-card.active { border: 1.5px solid #3b82f6; background: #f8faff; }
-  .stat-top { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); font-weight: 700; margin-bottom: 6px; }
-  .stat-num { font-size: 24px; font-weight: 800; line-height: 1.15; margin-bottom: 6px; }
-  .stat-bottom { font-size: 11px; color: var(--muted); }
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 12px;
+    position: relative;
+    z-index: 2;
+  }
+  @media (min-width: 720px) {
+    .stats-grid {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 13px 14px;
+    box-shadow: var(--shadow);
+    cursor: pointer;
+    min-width: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    touch-action: manipulation;
+    pointer-events: auto;
+    position: relative;
+    z-index: 3;
+  }
+  .stat-card.active {
+    border: 1.5px solid #3b82f6;
+    background: #f8faff;
+  }
+  .stat-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .stat-num {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--ink);
+    line-height: 1.15;
+    margin-bottom: 6px;
+  }
+  .stat-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .stat-card.active .stat-bottom {
+    color: var(--accent);
+    font-weight: 700;
+  }
 
-  .filter-card { padding: 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
-  .filter-row { display: grid; grid-template-columns: 1fr; gap: 8px; }
-  @media (min-width: 640px) { .filter-row.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .filter-footer { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
-  .link-btn { background: none; border: none; min-height: 32px; padding: 2px 6px; font-size: 12px; font-weight: 700; color: var(--accent); }
-  .link-btn.muted { color: #4b5563; }
+  /* Filter Card */
+  .filter-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 12px;
+    box-shadow: var(--shadow);
+    margin-bottom: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    z-index: 2;
+  }
+  .filter-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+  @media (min-width: 640px) {
+    .filter-row.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .filter-row.three {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .filter-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--muted);
+    padding-top: 2px;
+  }
+  .link-btn {
+    background: none;
+    border: none;
+    min-height: 32px;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .link-btn.muted {
+    color: #4b5563;
+  }
 
-  .vehicle-list { display: flex; flex-direction: column; gap: 10px; }
-  .v-card { padding: 14px; display: flex; flex-direction: column; gap: 10px; }
-  .v-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
-  .v-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
-  .v-plate { font-size: 20px; font-weight: 900; }
-  .v-model { font-size: 13px; color: var(--muted); font-weight: 600; }
-  .pill { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 999px; font-size: 11.5px; font-weight: 700; }
+  /* Vehicle List & Cards */
+  .vehicle-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    position: relative;
+    z-index: 2;
+  }
+  .v-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 0;
+  }
+  .v-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .v-badges {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .v-plate {
+    font-size: 20px;
+    font-weight: 900;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+  .v-model {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 3px 9px;
+    border-radius: 999px;
+    font-size: 11.5px;
+    font-weight: 700;
+  }
   .pill.partner { background: #eff6ff; color: #1d4ed8; }
   .pill.type { background: #f3f4f6; color: #374151; }
   .pill.rental { background: #fef3c7; color: #92400e; }
@@ -100,66 +408,325 @@
   .pill.st-work { background: #eff6ff; color: #1d4ed8; }
   .pill.st-done { background: #ecfdf5; color: #047857; }
 
-  .v-meta { display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 12.5px; color: #374151; background: var(--surface-2); padding: 9px 10px; border-radius: var(--radius-sm); }
-  @media (min-width: 640px) { .v-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .damage-tags { display: flex; flex-wrap: wrap; gap: 5px; }
-  .d-tag { font-size: 11px; font-weight: 600; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 2px 7px; border-radius: 6px; }
-  .v-memo { font-size: 12.5px; color: #374151; white-space: pre-line; }
-  .v-photos-preview { display: flex; gap: 8px; flex-wrap: wrap; }
-  .thumb-box { width: 64px; height: 64px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); position: relative; cursor: pointer; }
-  .thumb-box img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .thumb-tag { position: absolute; left: 0; right: 0; bottom: 0; background: rgba(17,24,39,0.78); color: #fff; font-size: 9.5px; text-align: center; padding: 1px 0; }
-  .v-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  @media (min-width: 640px) { .v-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-
-  .damage-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
-  @media (min-width: 640px) { .damage-picker { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  .dmg-btn { min-height: 38px; padding: 6px 8px; font-size: 12px; justify-content: flex-start; }
-  .dmg-btn.selected { background: #111827; color: #fff; border-color: #111827; }
-
-  .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.52); display: none; align-items: center; justify-content: center; padding: 12px; z-index: 9999; overflow-y: auto; }
-  .modal-backdrop.open { display: flex; }
-  .modal-box { background: var(--surface); border-radius: var(--radius); width: 100%; max-width: 660px; max-height: 90vh; overflow-y: auto; padding: 16px; }
-  .modal-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding-bottom: 10px; border-bottom: 1px solid var(--line); margin-bottom: 12px; }
-  .modal-title { font-size: 16px; font-weight: 800; margin: 0; }
-  .form-group { margin-bottom: 11px; }
-  .form-label { display: block; font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
-  .photo-zone { border: 1.5px dashed #9ca3af; border-radius: var(--radius-sm); padding: 10px; background: var(--surface-2); margin-bottom: 10px; }
-  .photo-hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .photo-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
-  .photo-item { position: relative; width: 72px; height: 72px; border-radius: 8px; overflow: hidden; border: 1px solid var(--line); }
-  .photo-item img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .photo-del { position: absolute; top: 2px; right: 2px; width: 22px; height: 22px; min-height: 22px; padding: 0; border-radius: 999px; font-size: 11px; background: rgba(220,38,38,0.92); color: #fff; border: none; }
-
-  .code-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
-  .code-table th, .code-table td { border: 1px solid var(--line); padding: 7px 8px; text-align: left; }
-  .code-table th { background: var(--surface-2); }
-
-  .toast {
-    position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px);
-    background: #111827; color: #fff; padding: 10px 16px; border-radius: 999px; font-size: 12.5px;
-    font-weight: 600; opacity: 0; pointer-events: none; transition: all 0.2s ease; z-index: 20000;
+  .v-meta {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 4px;
+    font-size: 12.5px;
+    color: #374151;
+    background: var(--surface-2);
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
   }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  .readonly-banner { display: none; background: #fffbeb; border: 1px solid #f59e0b; color: #92400e; border-radius: var(--radius-sm); padding: 9px 12px; margin-bottom: 10px; font-size: 12px; font-weight: 700; }
-  .readonly-banner.show { display: block; }
-  .empty-box { background: var(--surface); border: 1px dashed #cbd5e1; border-radius: var(--radius); padding: 28px 16px; text-align: center; color: var(--muted); }
+  @media (min-width: 640px) {
+    .v-meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+  .damage-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .d-tag {
+    font-size: 11px;
+    font-weight: 600;
+    background: #f1f5f9;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    padding: 2px 7px;
+    border-radius: 6px;
+  }
+  .v-memo {
+    font-size: 12.5px;
+    color: #374151;
+    white-space: pre-line;
+  }
+  .v-photos-preview {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .thumb-box {
+    width: 64px;
+    height: 64px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    position: relative;
+    background: #f3f4f6;
+    cursor: pointer;
+  }
+  .thumb-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .thumb-tag {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(17,24,39,0.78);
+    color: #fff;
+    font-size: 9.5px;
+    text-align: center;
+    padding: 1px 0;
+  }
+  .thumb-tag.cond {
+    background: rgba(5,150,105,0.85);
+  }
+  .drive-link-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    background: var(--accent-soft);
+    border: 1px solid #bfdbfe;
+    padding: 4px 8px;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+  .v-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  @media (min-width: 640px) {
+    .v-actions {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  /* Damage Selector Chips */
+  .damage-picker {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 6px;
+  }
+  @media (min-width: 640px) {
+    .damage-picker {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  .dmg-btn {
+    min-height: 38px;
+    padding: 6px 8px;
+    font-size: 12px;
+    justify-content: flex-start;
+    background: #fff;
+    color: #1f2937;
+    border: 1px solid #d1d5db;
+  }
+  .dmg-btn.selected {
+    background: #111827;
+    color: #ffffff;
+    border-color: #111827;
+  }
+
+  /* Modal */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.52);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    z-index: 9999;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .modal-backdrop.open {
+    display: flex;
+  }
+  .modal-box {
+    background: var(--surface);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 660px;
+    max-height: 90vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  }
+  .modal-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 12px;
+  }
+  .modal-title {
+    font-size: 16px;
+    font-weight: 800;
+    margin: 0;
+  }
+  .form-group {
+    margin-bottom: 11px;
+  }
+  .form-label {
+    display: block;
+    font-size: 12.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #1f2937;
+  }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  .photo-zone {
+    border: 1.5px dashed #9ca3af;
+    border-radius: var(--radius-sm);
+    padding: 10px;
+    background: var(--surface-2);
+    margin-bottom: 10px;
+  }
+  .photo-zone.after {
+    border-color: #60a5fa;
+    background: #f8faff;
+  }
+  .photo-zone.condition {
+    border-color: #34d399;
+    background: #f0fdf4;
+  }
+  .photo-meta-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 6px;
+  }
+  .photo-count {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #374151;
+  }
+  .photo-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .photo-item {
+    position: relative;
+    width: 72px;
+    height: 72px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #fff;
+  }
+  .photo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .photo-del {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 22px;
+    height: 22px;
+    min-height: 22px;
+    padding: 0;
+    border-radius: 999px;
+    font-size: 11px;
+    background: rgba(220, 38, 38, 0.92);
+    color: #fff;
+    border: none;
+  }
+  .code-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+  .code-table th, .code-table td {
+    border: 1px solid var(--line);
+    padding: 7px 8px;
+    text-align: left;
+  }
+  .code-table th {
+    background: var(--surface-2);
+    font-weight: 700;
+  }
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(20px);
+    background: #111827;
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 12.5px;
+    font-weight: 600;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    z-index: 20000;
+    max-width: 92vw;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .readonly-banner {
+    display: none;
+    background: #fffbeb;
+    border: 1px solid #f59e0b;
+    color: #92400e;
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    margin-bottom: 10px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .readonly-banner.show {
+    display: block;
+  }
+  .empty-box {
+    background: var(--surface);
+    border: 1px dashed #cbd5e1;
+    border-radius: var(--radius);
+    padding: 28px 16px;
+    text-align: center;
+    color: var(--muted);
+  }
 </style>
 </head>
 <body>
 <div class="app-wrap">
+  <!-- 상단 헤더 -->
   <header class="top-header">
     <div class="brand-top">
-      <div class="acro-box"><span class="en">ACRO</span><span class="sub">MOTORS</span></div>
-      <div>
+      <div class="acro-box">
+        <span class="en">ACRO</span>
+        <span class="sub">MOTORS</span>
+      </div>
+      <div class="brand-info">
         <div class="brand-title-row">
           <span class="brand-name">아크로 공업사</span>
           <span id="modeBadge" class="mode-pill">관리자 모드</span>
-          <span id="syncStatusBadge" class="sync-pill">⚡ 동기화 대기</span>
+          <span id="syncStatusBadge" class="sync-pill">⚡ 실시간 동기화 준비됨</span>
         </div>
         <p class="brand-desc">수입·국산 종합정비 · 판금·열처리 도장 · 보험수리 · 대차 실시간 관리 포털</p>
       </div>
     </div>
+
     <div class="btn-row-3">
       <button type="button" id="btnAdminMode" class="primary">👤 관리자 모드</button>
       <button type="button" id="btnPartnerMode" class="soft-gray">🏢 거래처 모드</button>
@@ -171,16 +738,40 @@
     </div>
   </header>
 
-  <div id="partnerReadOnlyBanner" class="readonly-banner"></div>
+  <div id="partnerReadOnlyBanner" class="readonly-banner">
+    🔒 거래처 전용 읽기 전용 화면입니다. 조회·사진 확대·안내문자 복사만 가능하며 등록·수정·삭제는 관리자 전용입니다.
+  </div>
 
+  <!-- 현황 대시보드 -->
   <section class="stats-grid">
-    <div class="stat-card active" id="stat-ALL" data-status="ALL"><div class="stat-top"><span>전체 입고 차량</span><span>🚗</span></div><div class="stat-num" id="cnt-ALL">0</div><div class="stat-bottom">전체 보기</div></div>
-    <div class="stat-card" id="stat-입고·견적 대기" data-status="입고·견적 대기"><div class="stat-top"><span>입고·견적 대기</span><span>⏳</span></div><div class="stat-num" id="cnt-WAIT">0</div><div class="stat-bottom">접수·부품</div></div>
-    <div class="stat-card" id="stat-판금 진행" data-status="판금 진행"><div class="stat-top"><span>판금 진행</span><span>🔨</span></div><div class="stat-num" id="cnt-METAL">0</div><div class="stat-bottom">차체·판금</div></div>
-    <div class="stat-card" id="stat-도장 진행" data-status="도장 진행"><div class="stat-top"><span>도장 진행</span><span>🎨</span></div><div class="stat-num" id="cnt-PAINT">0</div><div class="stat-bottom">열처리·도장</div></div>
-    <div class="stat-card" id="stat-출고 대기·완료" data-status="출고 대기·완료"><div class="stat-top"><span>출고 대기·완료</span><span>✅</span></div><div class="stat-num" id="cnt-DONE">0</div><div class="stat-bottom">인도 준비</div></div>
+    <div class="stat-card active" id="stat-ALL" data-status="ALL">
+      <div class="stat-top"><span>전체 입고 차량</span><span>🚗</span></div>
+      <div class="stat-num" id="cnt-ALL">0</div>
+      <div class="stat-bottom"><span>전체 보기</span></div>
+    </div>
+    <div class="stat-card" id="stat-입고·견적 대기" data-status="입고·견적 대기">
+      <div class="stat-top"><span>입고·견적 대기</span><span>⏳</span></div>
+      <div class="stat-num" id="cnt-WAIT">0</div>
+      <div class="stat-bottom"><span>접수·부품</span></div>
+    </div>
+    <div class="stat-card" id="stat-판금 진행" data-status="판금 진행">
+      <div class="stat-top"><span>판금 진행</span><span>🔨</span></div>
+      <div class="stat-num" id="cnt-METAL">0</div>
+      <div class="stat-bottom"><span>차체·판금</span></div>
+    </div>
+    <div class="stat-card" id="stat-도장 진행" data-status="도장 진행">
+      <div class="stat-top"><span>도장 진행</span><span>🎨</span></div>
+      <div class="stat-num" id="cnt-PAINT">0</div>
+      <div class="stat-bottom"><span>열처리·도장</span></div>
+    </div>
+    <div class="stat-card" id="stat-출고 대기·완료" data-status="출고 대기·완료">
+      <div class="stat-top"><span>출고 대기·완료</span><span>✅</span></div>
+      <div class="stat-num" id="cnt-DONE">0</div>
+      <div class="stat-bottom"><span>인도 준비</span></div>
+    </div>
   </section>
 
+  <!-- 검색 및 필터 -->
   <section class="filter-card">
     <input type="text" id="searchInput" placeholder="🔍 차량번호(예: 5921), 차종, 고객명, 보험사, 접수번호, 담당자 검색">
     <select id="partnerFilter"></select>
@@ -205,9 +796,11 @@
     </div>
   </section>
 
+  <!-- 차량 목록 -->
   <main id="vehicleList" class="vehicle-list"></main>
 </div>
 
+<!-- 차량 등록/수정 모달 -->
 <div id="vehicleModal" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-head">
@@ -216,8 +809,12 @@
     </div>
     <form id="vehicleForm">
       <input type="hidden" id="editVehicleId">
+
       <div class="filter-row two form-group">
-        <div><label class="form-label">의뢰 거래처 *</label><select id="fPartner" required></select></div>
+        <div>
+          <label class="form-label">의뢰 거래처 *</label>
+          <select id="fPartner" required></select>
+        </div>
         <div>
           <label class="form-label">입고 구분 *</label>
           <select id="fType" required>
@@ -228,22 +825,48 @@
           </select>
         </div>
       </div>
+
       <div class="filter-row two form-group">
-        <div><label class="form-label">차량번호 *</label><input type="text" id="fPlate" required placeholder="예: 219하 4410"></div>
-        <div><label class="form-label">차종 *</label><input type="text" id="fModel" required placeholder="예: BYD 아토 3"></div>
+        <div>
+          <label class="form-label">차량번호 *</label>
+          <input type="text" id="fPlate" required placeholder="예: 219하 4410">
+        </div>
+        <div>
+          <label class="form-label">차종 *</label>
+          <input type="text" id="fModel" required placeholder="예: BYD 아토 3 / 지프 랭글러">
+        </div>
       </div>
+
       <div class="filter-row two form-group">
-        <div><label class="form-label">고객명</label><input type="text" id="fCustomer" placeholder="예: 홍길동"></div>
-        <div><label class="form-label">연락처</label><input type="tel" id="fPhone" placeholder="예: 010-1234-5678"></div>
+        <div>
+          <label class="form-label">고객명</label>
+          <input type="text" id="fCustomer" placeholder="예: 홍길동">
+        </div>
+        <div>
+          <label class="form-label">연락처</label>
+          <input type="tel" id="fPhone" placeholder="예: 010-1234-5678">
+        </div>
       </div>
+
       <div class="filter-row two form-group">
-        <div><label class="form-label">보험사</label><input type="text" id="fInsurance" placeholder="예: 삼성화재, DB손해보험"></div>
-        <div><label class="form-label">보험/사고 접수번호</label><input type="text" id="fClaimNo" placeholder="예: 2026-88412"></div>
+        <div>
+          <label class="form-label">보험사 (수기 입력)</label>
+          <input type="text" id="fInsurance" placeholder="보험사명을 직접 입력하세요 (예: 삼성화재, DB손해보험)">
+        </div>
+        <div>
+          <label class="form-label">보험/사고 접수번호 (선택)</label>
+          <input type="text" id="fClaimNo" placeholder="예: 2026-88412">
+        </div>
       </div>
+
       <div class="form-group">
-        <label class="form-label"><input type="checkbox" id="fRental" style="width:auto;min-height:auto;margin-right:6px;">대차(렌터카) 지원 신청</label>
-        <input type="text" id="fRentalInfo" placeholder="대차 차종 또는 차량번호" style="display:none;margin-top:6px;">
+        <label class="form-label">
+          <input type="checkbox" id="fRental" style="width:auto; min-height:auto; margin-right:6px;">
+          대차(렌터카) 지원 신청
+        </label>
+        <input type="text" id="fRentalInfo" placeholder="대차 차종 또는 차량번호 (예: 아반떼 CN7 / 72허 1120)" style="display:none; margin-top:6px;">
       </div>
+
       <div class="filter-row two form-group">
         <div>
           <label class="form-label">공정 상태</label>
@@ -263,37 +886,63 @@
           </select>
         </div>
       </div>
+
       <div class="filter-row two form-group">
-        <div><label class="form-label">출고 예정일</label><input type="date" id="fDueDate"></div>
-        <div><label class="form-label">예상 수리비 (원)</label><input type="text" id="fEstimate" placeholder="예: 850,000"></div>
+        <div>
+          <label class="form-label">출고 예정일</label>
+          <input type="date" id="fDueDate">
+        </div>
+        <div>
+          <label class="form-label">예상 수리비 (원)</label>
+          <input type="text" id="fEstimate" placeholder="예: 850,000">
+        </div>
       </div>
+
+      <!-- 손상 부위 세분화 선택 (총 25개) -->
       <div class="form-group">
-        <label class="form-label">손상 부위 선택</label>
+        <label class="form-label">손상 부위 선택 (원터치 다중 선택)</label>
         <div id="damagePicker" class="damage-picker"></div>
       </div>
+
       <div class="form-group">
         <label class="form-label">정비/파손 메모</label>
-        <textarea id="fMemo" placeholder="특이사항을 입력하세요"></textarea>
+        <textarea id="fMemo" placeholder="파손 위치, 교환/판금 내용, 특이사항을 입력하세요"></textarea>
       </div>
-      <div class="photo-zone form-group">
-        <label class="form-label">🩺 컨디션 체크 사진 (최대 10장)</label>
+
+      <!-- 차량 컨디션 체크 사진 (최대 30장) -->
+      <div class="photo-zone condition form-group">
+        <div class="photo-meta-row">
+          <label class="form-label" style="margin:0;">🩺 차량 컨디션 체크 사진 (최대 30장)</label>
+          <span id="conditionCountBadge" class="photo-count">0 / 30장</span>
+        </div>
+        <div class="stat-sub" style="margin-bottom:6px;">계기판(주행거리·경고등), 타이어 마모, 실내·외관 기존 상태 기록 · 저장 시 구글 드라이브 업로드</div>
         <input type="file" id="conditionPhotoInput" accept="image/*" multiple>
-        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
         <div id="conditionPhotoPreview" class="photo-grid"></div>
       </div>
+
+      <!-- 작업전 사진 (최대 30장) -->
       <div class="photo-zone form-group">
-        <label class="form-label">📷 작업전 사진 (최대 10장)</label>
+        <div class="photo-meta-row">
+          <label class="form-label" style="margin:0;">📷 작업전 사진 (최대 30장)</label>
+          <span id="beforeCountBadge" class="photo-count">0 / 30장</span>
+        </div>
+        <div class="stat-sub" style="margin-bottom:6px;">저장 시 구글 드라이브 폴더에 저장되고 시트·카드에 링크가 기록됩니다.</div>
         <input type="file" id="beforePhotoInput" accept="image/*" multiple>
-        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
         <div id="beforePhotoPreview" class="photo-grid"></div>
       </div>
-      <div class="photo-zone form-group">
-        <label class="form-label">📸 작업후 사진 (최대 10장)</label>
+
+      <!-- 작업후 사진 (최대 30장) -->
+      <div class="photo-zone after form-group">
+        <div class="photo-meta-row">
+          <label class="form-label" style="margin:0;">📸 작업후 사진 (최대 30장)</label>
+          <span id="afterCountBadge" class="photo-count">0 / 30장</span>
+        </div>
+        <div class="stat-sub" style="margin-bottom:6px;">저장 시 구글 드라이브 폴더에 저장되고 시트·카드에 링크가 기록됩니다.</div>
         <input type="file" id="afterPhotoInput" accept="image/*" multiple>
-        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
         <div id="afterPhotoPreview" class="photo-grid"></div>
       </div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+
+      <div style="display:flex; gap:8px; justify-content:flex-end; margin-top:14px;">
         <button type="button" data-close-modal="vehicleModal">취소</button>
         <button type="submit" id="btnSubmitVehicle" class="primary">저장하기</button>
       </div>
@@ -301,771 +950,1581 @@
   </div>
 </div>
 
+<!-- 관리자 인증 모달 -->
 <div id="adminModal" class="modal-backdrop">
   <div class="modal-box">
-    <div class="modal-head"><h3 class="modal-title">👤 관리자 로그인</h3><button type="button" class="small" data-close-modal="adminModal">닫기 ✕</button></div>
-    <div class="form-group"><label class="form-label">관리자 PIN</label><input type="password" id="adminPinInput" placeholder="초기값: ACRO-0000"></div>
+    <div class="modal-head">
+      <h3 class="modal-title">👤 관리자 전용 로그인</h3>
+      <button type="button" class="small" data-close-modal="adminModal">닫기 ✕</button>
+    </div>
+    <p class="brand-desc" style="white-space:normal; margin-bottom:10px;">
+      거래처 모드에서 전체 관리자 화면으로 돌아오려면 <strong>관리자 비밀번호(PIN)</strong>를 입력해야 합니다.
+    </p>
+    <div class="form-group">
+      <label class="form-label">관리자 비밀번호 (PIN)</label>
+      <input type="password" id="adminPinInput" placeholder="관리자 비밀번호 입력 (초기값: ACRO-0000)">
+    </div>
     <button type="button" id="btnConfirmAdmin" class="primary" style="width:100%;">관리자 모드로 전환</button>
   </div>
 </div>
 
+<!-- 거래처 모드 접속 모달 -->
 <div id="partnerModal" class="modal-backdrop">
   <div class="modal-box">
-    <div class="modal-head"><h3 class="modal-title">🏢 거래처 전용 접속</h3><button type="button" class="small" data-close-modal="partnerModal">닫기 ✕</button></div>
-    <div class="form-group"><label class="form-label">거래처 선택</label><select id="partnerAuthSelect"></select></div>
-    <div class="form-group"><label class="form-label">거래처 접속 코드</label><input type="text" id="partnerPinInput" placeholder="예: ACRO-BYD-CJ"></div>
-    <button type="button" id="btnSwitchPartner" class="accent" style="width:100%;">거래처 화면 보기</button>
+    <div class="modal-head">
+      <h3 class="modal-title">거래처 전용 모드 접속</h3>
+      <button type="button" class="small" data-close-modal="partnerModal">닫기 ✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">거래처 선택</label>
+      <select id="partnerAuthSelect"></select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">거래처 접속 코드 (PIN) *</label>
+      <input type="text" id="partnerPinInput" placeholder="예: ACRO-BYD-CJ">
+      <div id="partnerPinHint" class="stat-sub" style="margin-top:4px; color:#6b7280;"></div>
+    </div>
+    <button type="button" id="btnSwitchPartner" class="accent" style="width:100%;">해당 거래처 차량만 보기</button>
   </div>
 </div>
 
+<!-- 실시간 동기화 · 접속 코드 모달 -->
 <div id="syncModal" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-head">
-      <h3 class="modal-title">☁️ 구글 시트 동기화 설정</h3>
+      <h3 class="modal-title">실시간 동기화 · 거래처 접속 코드</h3>
       <button type="button" class="small" data-close-modal="syncModal">닫기 ✕</button>
     </div>
-    <div class="form-group">
-      <label class="form-label">Google Apps Script 웹 앱 URL</label>
-      <input type="text" id="gasUrlInput" placeholder="https://script.google.com/macros/s/.../exec">
-      <div class="photo-hint">비워두면 브라우저(localStorage) 기준으로 단독 동작합니다.</div>
+    <p class="brand-desc" style="white-space:normal; margin-bottom:10px;">
+      Google Apps Script 웹 앱(<code>.../exec</code>) URL을 저장하면 사진은 <strong>구글 드라이브</strong>에 업로드되고 차량 데이터는 <strong>구글 시트</strong>와 10초마다 자동 동기화됩니다.
+    </p>
+    <div class="filter-row two form-group">
+      <div>
+        <label class="form-label">Google Apps Script 웹 앱 URL (시트·드라이브)</label>
+        <input type="text" id="syncEndpointInput" placeholder="https://script.google.com/macros/s/.../exec">
+      </div>
+      <div>
+        <label class="form-label">관리자 비밀번호 (PIN)</label>
+        <input type="text" id="adminPinSettingInput" placeholder="예: ACRO-0000">
+      </div>
     </div>
-    <div class="form-group">
-      <label class="form-label">거래처 접속 코드 안내</label>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
+      <button type="button" id="btnPullRemote" class="small">원격 데이터 불러오기</button>
+      <button type="button" id="btnPushAllRemote" class="small">전체 시트 업로드</button>
+      <button type="button" id="btnExportJson" class="small">JSON 백업 저장</button>
+      <button type="button" id="btnImportJsonTrigger" class="small">JSON 백업 불러오기</button>
+      <input type="file" id="importJsonInput" accept="application/json,.json" style="display:none;">
+      <button type="button" id="btnSaveSync" class="small primary">설정 저장</button>
+    </div>
+
+    <div class="form-label">거래처별 전용 링크 복사 & 접속 코드 (거래처는 본인 입고 차량만 조회)</div>
+    <div style="overflow-x:auto;">
       <table class="code-table">
         <thead>
-          <tr><th>거래처</th><th>접속 코드</th></tr>
+          <tr>
+            <th>거래처명</th>
+            <th>접속 코드</th>
+            <th>전용 링크 복사</th>
+            <th>전환</th>
+          </tr>
         </thead>
         <tbody id="partnerCodeTableBody"></tbody>
       </table>
     </div>
-    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
-      <button type="button" id="btnTestSync">연결/동기화 실행</button>
-      <button type="button" id="btnSaveSync" class="primary">설정 저장</button>
-    </div>
   </div>
 </div>
 
+<!-- 사진 확대 보기 모달 -->
 <div id="photoViewerModal" class="modal-backdrop">
-  <div class="modal-box" style="max-width:780px;text-align:center;">
+  <div class="modal-box" style="text-align:center;">
     <div class="modal-head">
       <h3 id="photoViewerTitle" class="modal-title">사진 보기</h3>
       <button type="button" class="small" data-close-modal="photoViewerModal">닫기 ✕</button>
     </div>
-    <img id="photoViewerImg" src="" alt="미리보기" style="max-width:100%;max-height:70vh;border-radius:10px;object-fit:contain;">
+    <img id="photoViewerImg" src="" alt="확대 사진" style="max-width:100%; max-height:70vh; border-radius:10px;">
   </div>
 </div>
 
 <div id="toast" class="toast"></div>
 
 <script>
-(function () {
-  const STORAGE_KEY = 'ACRO_MOTORS_VEHICLES_V1';
-  const SYNC_KEY = 'ACRO_MOTORS_SYNC_CONFIG_V1';
-  const ADMIN_PIN = 'ACRO-0000';
+(function() {
+  const STORAGE_KEY = 'ACRO_MOTORS_VEHICLES_FINAL_V1';
+  const CONFIG_KEY = 'ACRO_MOTORS_CONFIG_FINAL_V1';
+  const CHANNEL_NAME = 'ACRO_MOTORS_SYNC_FINAL_V1';
+  const MAX_PHOTOS_PER_TYPE = 30;
+  const DEFAULT_ADMIN_PIN = 'ACRO-0000';
+  const DEFAULT_SYNC_ENDPOINT = '';
 
-  const PARTNERS = [
-    { id: 'ALL', name: '전체 거래처', code: '' },
-    { id: 'BYD_CJ', name: 'BYD 천안·청주', code: 'ACRO-BYD-CJ' },
-    { id: 'GENERAL', name: '일반/개별 입고', code: 'ACRO-GEN-01' },
-    { id: 'INS_DIRECT', name: '보험사/협력업체', code: 'ACRO-INS-02' }
+  const memoryStore = {
+    [STORAGE_KEY]: null,
+    [CONFIG_KEY]: null
+  };
+
+  function safeGetItem(key) {
+    try {
+      if (window.localStorage) return window.localStorage.getItem(key);
+    } catch (e) {}
+    return memoryStore[key];
+  }
+
+  function safeSetItem(key, val) {
+    memoryStore[key] = val;
+    try {
+      if (window.localStorage) {
+        window.localStorage.setItem(key, val);
+        return true;
+      }
+    } catch (e) {}
+    return false;
+  }
+
+  const DEFAULT_PARTNERS = [
+    { name: '청주 BYD', code: 'ACRO-BYD-CJ' },
+    { name: '대전 BYD', code: 'ACRO-BYD-DJ' },
+    { name: '대전 지프', code: 'ACRO-JEEP-DJ' },
+    { name: '안수상', code: 'ACRO-ANS' },
+    { name: '정재식', code: 'ACRO-JJS' },
+    { name: '119렉카', code: 'ACRO-119' },
+    { name: '스피드메이트', code: 'ACRO-SM' },
+    { name: '케이카', code: 'ACRO-KCAR' },
+    { name: '일반 개인고객', code: 'ACRO-PERS' },
+    { name: '기타 협력 거래처', code: 'ACRO-ETC' }
   ];
+
+  const EXCLUDED_PARTNERS = ['롯데렌터카 대전지점', '수입차 인증중고 딜러'];
 
   const DAMAGE_PARTS = [
-    '앞범퍼', '뒷범퍼', '본넷', '트렁크',
-    '좌측 앞문', '좌측 뒷문', '우측 앞문', '우측 뒷문',
-    '좌측 앞휀더', '좌측 뒷휀더', '우측 앞휀더', '우측 뒷휀더',
-    '루프/선루프', '헤드램프/테일램프', '휠/타이어/하체'
+    '앞범퍼',
+    '앞 팬더 (운전석)',
+    '앞 팬더 (조수석)',
+    '앞도어 (운전석)',
+    '앞도어 (조수석)',
+    '뒤도어 (운전석)',
+    '뒤도어 (조수석)',
+    '뒤 팬더 (운전석)',
+    '뒤 팬더 (조수석)',
+    '뒤범퍼',
+    '휠 (운전석 앞)',
+    '휠 (운전석 뒤)',
+    '휠 (조수석 앞)',
+    '휠 (조수석 뒤)',
+    '타이어 (운전석 앞)',
+    '타이어 (운전석 뒤)',
+    '타이어 (조수석 앞)',
+    '타이어 (조수석 뒤)',
+    '헤드라이트 (운전석)',
+    '헤드라이트 (조수석)',
+    '테일램프 (운전석)',
+    '테일램프 (조수석)',
+    '에어백',
+    '하체',
+    '라디에이터'
   ];
 
-  const SAMPLE_VEHICLES = [
+  const INITIAL_VEHICLES = [
     {
-      id: 'v-101',
-      partner: 'BYD_CJ',
-      type: '보험수리',
+      id: 'v-9001',
+      partner: '청주 BYD',
+      type: '판금·도장',
       plate: '219하 4410',
       model: 'BYD 아토 3',
-      customer: '김민수',
-      phone: '010-2345-6789',
+      customer: '박준호',
+      phone: '010-5512-9081',
       insurance: '삼성화재',
-      claimNo: '2026-88412',
-      rental: true,
-      rentalInfo: '아반떼 CN7 (대차 배차완료)',
-      status: '판금 진행',
-      tech: '판금부 최성윤 팀장',
-      dueDate: '2026-11-28',
-      estimate: '1,450,000',
-      damages: ['앞범퍼', '우측 앞휀더', '헤드램프/테일램프'],
-      memo: '우측 전방 추돌, 범퍼 브라켓 및 휀더 단차 교정 필요.',
-      photos: { condition: [], before: [], after: [] },
-      updatedAt: '2026-11-24 09:30'
-    },
-    {
-      id: 'v-102',
-      partner: 'GENERAL',
-      type: '판금·도장',
-      plate: '5921',
-      model: '제네시스 G80',
-      customer: '이서준',
-      phone: '010-8765-4321',
-      insurance: '',
-      claimNo: '',
+      claimNo: '2026-112044',
       rental: false,
       rentalInfo: '',
       status: '도장 진행',
       tech: '도장부 강신철',
+      dueDate: '2026-11-24',
+      estimate: '920,000',
+      damages: ['앞범퍼', '앞 팬더 (운전석)'],
+      memo: '도장·열처리 부스 공정 진행 중',
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: [],
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-21 10:20'
+    },
+    {
+      id: 'v-9002',
+      partner: '대전 BYD',
+      type: '보험수리',
+      plate: '148가 5921',
+      model: 'BYD 씰',
+      customer: '김민수',
+      phone: '010-4821-1190',
+      insurance: 'DB손해보험',
+      claimNo: '2026-091824',
+      rental: true,
+      rentalInfo: '아반떼 CN7 / 72허 4410',
+      status: '판금 진행',
+      tech: '판금부 최성윤 팀장',
+      dueDate: '2026-11-25',
+      estimate: '1,350,000',
+      damages: ['앞범퍼', '헤드라이트 (운전석)'],
+      memo: '전방 수리 및 대차 배차 완료',
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: [],
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-20 15:10'
+    },
+    {
+      id: 'v-9003',
+      partner: '대전 지프',
+      type: '일반정비',
+      plate: '312나 7740',
+      model: '지프 랭글러 루비콘',
+      customer: '박지훈',
+      phone: '010-9012-3345',
+      insurance: '',
+      claimNo: '',
+      rental: false,
+      rentalInfo: '',
+      status: '입고·견적 대기',
+      tech: '정비부 이성제 팀장',
       dueDate: '2026-11-26',
       estimate: '680,000',
-      damages: ['좌측 뒷문', '좌측 뒷휀더'],
-      memo: '주차 중 문콕 및 스침 스크래치 부분 판금 후 열처리 도장 예정.',
-      photos: { condition: [], before: [], after: [] },
-      updatedAt: '2026-11-24 11:15'
+      damages: ['하체', '휠 (조수석 뒤)'],
+      memo: '입고 접수 및 부품 견적 확인 대기',
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: [],
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-22 09:05'
+    },
+    {
+      id: 'v-9004',
+      partner: '케이카',
+      type: '출고점검',
+      plate: '089다 3019',
+      model: '제네시스 G80',
+      customer: '이서연',
+      phone: '010-7731-8820',
+      insurance: '현대해상',
+      claimNo: '2026-110293',
+      rental: false,
+      rentalInfo: '',
+      status: '출고 대기·완료',
+      tech: '정비부 이성제 팀장',
+      dueDate: '2026-11-22',
+      estimate: '520,000',
+      damages: ['뒤범퍼'],
+      memo: '출고 최종 점검 및 인도 준비 완료',
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: [],
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-19 13:40'
     }
   ];
 
-  let state = {
-    mode: 'ADMIN',
-    activePartner: 'ALL',
-    statusFilter: 'ALL',
-    search: '',
-    partnerFilter: 'ALL',
-    typeFilter: 'ALL',
-    rentalFilter: 'ALL',
+  const state = {
     vehicles: [],
-    syncConfig: { gasUrl: '' },
-    draftPhotos: { condition: [], before: [], after: [] },
-    selectedDamages: []
+    partners: [],
+    config: {
+      role: 'ADMIN',
+      activePartner: '',
+      syncEndpoint: DEFAULT_SYNC_ENDPOINT,
+      adminPin: DEFAULT_ADMIN_PIN,
+      lockedPartner: false
+    },
+    statusFilter: 'ALL',
+    tempConditionPhotos: [],
+    tempBeforePhotos: [],
+    tempAfterPhotos: [],
+    tempDriveLinks: { condition: [], before: [], after: [] },
+    tempDamages: []
   };
 
-  const $ = (id) => document.getElementById(id);
+  function setupPwaAssets() {
+    try {
+      const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#111827"/><rect x="14" y="14" width="164" height="164" rx="26" fill="none" stroke="#374151" stroke-width="4"/><text x="96" y="96" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="44" letter-spacing="4" fill="#ef4444">ACRO</text><text x="96" y="136" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#f9fafb">아크로 공업사</text></svg>';
+      const iconDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+      const appleLink = document.getElementById('appleTouchIconLink');
+      if (appleLink) appleLink.href = iconDataUrl;
+
+      const manifestLink = document.getElementById('manifestLink');
+      if (manifestLink && typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
+        const manifestObj = {
+          name: 'ACRO 아크로 공업사',
+          short_name: 'ACRO 공업사',
+          start_url: './',
+          display: 'standalone',
+          background_color: '#f3f4f6',
+          theme_color: '#111827',
+          icons: [{ src: iconDataUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' }]
+        };
+        const mBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        manifestLink.href = URL.createObjectURL(mBlob);
+      }
+    } catch (e) {}
+  }
+
+  let bc = null;
+  let autoSyncTimer = null;
+  let isSyncingRemote = false;
+
+  try {
+    if ('BroadcastChannel' in window) {
+      bc = new BroadcastChannel(CHANNEL_NAME);
+      bc.onmessage = (event) => {
+        if (event.data && event.data.type === 'VEHICLES_UPDATED') {
+          state.vehicles = normalizeVehicles(event.data.vehicles || []);
+          renderAll();
+          showToast('다른 화면에서 변경된 입고 내역이 동기화되었습니다.');
+        }
+      };
+    }
+  } catch (e) {}
+
+  function parseRemoteVehicleList(data) {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.vehicles)) return data.vehicles;
+    if (data && data.data && Array.isArray(data.data.vehicles)) return data.data.vehicles;
+    return null;
+  }
+
+  function fetchRemoteVehicles({ silent = false, customUrl = '' } = {}) {
+    const url = (customUrl || state.config.syncEndpoint || '').trim();
+    if (!url) {
+      if (!silent) showToast('먼저 Google Apps Script 웹 앱(..../exec) URL을 입력하세요.');
+      return;
+    }
+    if (url.indexOf('/macros/echo') !== -1) {
+      if (!silent) showToast('구글 시트 연동용 /exec 웹 앱 URL을 입력해 주세요.');
+      return;
+    }
+    if (isSyncingRemote) return;
+    isSyncingRemote = true;
+
+    const sep = url.indexOf('?') === -1 ? '?' : '&';
+    const fetchUrl = `${url}${sep}action=list&_ts=${Date.now()}`;
+
+    fetch(fetchUrl, { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        const list = parseRemoteVehicleList(data);
+        if (!list) {
+          if (!silent) showToast('불러올 차량 목록 형식이 올바르지 않습니다.');
+          return;
+        }
+        const normalized = normalizeVehicles(list);
+        const prevSerialized = JSON.stringify(state.vehicles);
+        const nextSerialized = JSON.stringify(normalized);
+        if (prevSerialized !== nextSerialized) {
+          state.vehicles = normalized;
+          saveStorage(false);
+          if (bc) {
+            try { bc.postMessage({ type: 'VEHICLES_UPDATED', vehicles: state.vehicles }); } catch (e) {}
+          }
+          renderAll();
+          if (!silent) {
+            showToast('구글 시트에서 최신 데이터를 불러왔습니다.');
+          } else {
+            showToast('최신 구글 시트 데이터가 자동 반영되었습니다.');
+          }
+        } else if (!silent) {
+          showToast('이미 최신 구글 시트 데이터와 동일합니다.');
+        }
+      })
+      .catch(() => {
+        if (!silent) showToast('구글 시트 불러오기에 실패했습니다. 웹 앱 URL과 배포 권한을 확인해 주세요.');
+      })
+      .finally(() => {
+        isSyncingRemote = false;
+      });
+  }
+
+  function startAutoRemoteSync() {
+    if (autoSyncTimer) {
+      clearInterval(autoSyncTimer);
+      autoSyncTimer = null;
+    }
+    if (!state.config.syncEndpoint) return;
+
+    fetchRemoteVehicles({ silent: true });
+
+    autoSyncTimer = setInterval(() => {
+      if (document.hidden) return;
+      const modalOpen = document.querySelector('.modal-backdrop.open');
+      if (modalOpen) return;
+      fetchRemoteVehicles({ silent: true });
+    }, 10000);
+  }
+
+  function sanitizePartnerName(name) {
+    if (!name) return '기타 협력 거래처';
+    const trimmed = String(name).trim();
+    if (/^청주\s*byd$/i.test(trimmed)) return '청주 BYD';
+    if (/^대전\s*byd$/i.test(trimmed)) return '대전 BYD';
+    if (EXCLUDED_PARTNERS.includes(trimmed)) return '기타 협력 거래처';
+    return trimmed;
+  }
+
+  function normalizePartners(savedPartners) {
+    const map = new Map();
+    DEFAULT_PARTNERS.forEach(p => map.set(p.name, { ...p }));
+    if (Array.isArray(savedPartners)) {
+      savedPartners.forEach(p => {
+        if (!p || !p.name) return;
+        const cleanName = sanitizePartnerName(p.name);
+        if (!EXCLUDED_PARTNERS.includes(p.name.trim())) {
+          map.set(cleanName, {
+            name: cleanName,
+            code: p.code || (map.get(cleanName) && map.get(cleanName).code) || 'ACRO-PTR'
+          });
+        }
+      });
+    }
+    return Array.from(map.values());
+  }
+
+  function sanitizeTechName(tech) {
+    if (!tech) return '판금부 최성윤 팀장';
+    const t = String(tech).trim();
+    if (t === '이판금 팀장') return '판금부 최성윤 팀장';
+    if (t === '박도장 실장') return '도장부 강신철';
+    if (t === '김정비 반장' || t === '최진단 주임') return '정비부 이성제 팀장';
+    return t;
+  }
+
+  function normalizeVehicles(list) {
+    return (list || []).map(v => ({
+      ...v,
+      partner: sanitizePartnerName(v.partner),
+      tech: sanitizeTechName(v.tech),
+      status: v.status === '정비·도장 진행' ? '판금 진행' : (v.status || '입고·견적 대기'),
+      insurance: v.insurance || '',
+      damages: Array.isArray(v.damages) ? v.damages : [],
+      conditionPhotos: Array.isArray(v.conditionPhotos) ? v.conditionPhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
+      beforePhotos: Array.isArray(v.beforePhotos) ? v.beforePhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
+      afterPhotos: Array.isArray(v.afterPhotos) ? v.afterPhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
+      driveLinks: {
+        condition: Array.isArray(v.driveLinks?.condition) ? v.driveLinks.condition : [],
+        before: Array.isArray(v.driveLinks?.before) ? v.driveLinks.before : [],
+        after: Array.isArray(v.driveLinks?.after) ? v.driveLinks.after : []
+      }
+    }));
+  }
+
+  function loadStorage() {
+    try {
+      const rawConfig = JSON.parse(safeGetItem(CONFIG_KEY) || '{}');
+      const hasCustomEndpoint = Object.prototype.hasOwnProperty.call(rawConfig, 'syncEndpoint') && String(rawConfig.syncEndpoint || '').trim().length > 0;
+      const savedEndpoint = hasCustomEndpoint ? String(rawConfig.syncEndpoint).trim() : DEFAULT_SYNC_ENDPOINT;
+      state.config = {
+        role: rawConfig.role === 'PARTNER' ? 'PARTNER' : 'ADMIN',
+        activePartner: sanitizePartnerName(rawConfig.activePartner || ''),
+        syncEndpoint: savedEndpoint.indexOf('/macros/echo') === -1 ? savedEndpoint : '',
+        adminPin: rawConfig.adminPin || DEFAULT_ADMIN_PIN,
+        lockedPartner: !!rawConfig.lockedPartner
+      };
+    } catch (e) {}
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlSync = params.get('sync');
+      if (urlSync && urlSync.trim().indexOf('/macros/echo') === -1) {
+        state.config.syncEndpoint = urlSync.trim();
+      }
+      const urlPartner = params.get('partner');
+      const urlCode = (params.get('code') || '').trim().toUpperCase();
+      if (urlPartner) {
+        const cleanP = sanitizePartnerName(urlPartner);
+        const found = DEFAULT_PARTNERS.find(p => p.name === cleanP);
+        if (found && (!urlCode || urlCode === found.code.toUpperCase())) {
+          state.config.role = 'PARTNER';
+          state.config.activePartner = found.name;
+          state.config.lockedPartner = true;
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const rawData = JSON.parse(safeGetItem(STORAGE_KEY) || 'null');
+      if (Array.isArray(rawData) && rawData.length > 0) {
+        state.vehicles = normalizeVehicles(rawData);
+      } else {
+        state.vehicles = normalizeVehicles(INITIAL_VEHICLES);
+      }
+    } catch (e) {
+      state.vehicles = normalizeVehicles(INITIAL_VEHICLES);
+    }
+
+    state.partners = normalizePartners(state.vehicles.map(v => ({ name: v.partner })));
+    saveStorage(false);
+  }
+
+  function postToGas(payload) {
+    const url = (state.config.syncEndpoint || '').trim();
+    if (!url || url.indexOf('/macros/echo') !== -1) return Promise.resolve(null);
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(res => res.json()).catch(() => null);
+  }
+
+  function saveStorage(broadcast = true, vehicleRecord = null, deletedId = null) {
+    try {
+      safeSetItem(STORAGE_KEY, JSON.stringify(state.vehicles));
+    } catch (e) {
+      showToast('브라우저 저장 용량 한도 초과: 드라이브 링크 기준으로 저장됩니다.');
+    }
+    safeSetItem(CONFIG_KEY, JSON.stringify(state.config));
+
+    if (broadcast && bc) {
+      try { bc.postMessage({ type: 'VEHICLES_UPDATED', vehicles: state.vehicles }); } catch (e) {}
+    }
+
+    if (broadcast && state.config.syncEndpoint) {
+      if (deletedId) {
+        postToGas({ action: 'deleteVehicle', id: deletedId });
+      } else if (vehicleRecord) {
+        postToGas({ action: 'upsertVehicle', vehicle: vehicleRecord });
+      } else {
+        postToGas({ action: 'syncAll', updatedAt: new Date().toISOString(), vehicles: state.vehicles });
+      }
+    }
+  }
+
+  function pushAllVehiclesToGas() {
+    const url = (state.config.syncEndpoint || '').trim();
+    if (!url) {
+      showToast('먼저 Google Apps Script 웹 앱(..../exec) URL을 입력하세요.');
+      return;
+    }
+    showToast('구글 시트에 전체 차량 데이터를 업로드하는 중...');
+    postToGas({ action: 'syncAll', updatedAt: new Date().toISOString(), vehicles: state.vehicles })
+      .then(res => {
+        if (res && res.ok) {
+          showToast(`구글 시트에 ${state.vehicles.length}대 동기화 완료`);
+        } else {
+          showToast('시트 응답을 확인해 주세요. (웹 앱 배포 권한 확인)');
+        }
+      });
+  }
+
+  async function uploadPhotosToDrive(record) {
+    const url = (state.config.syncEndpoint || '').trim();
+    if (!url || url.indexOf('/macros/echo') !== -1) return record;
+
+    const kinds = [
+      { photoKey: 'conditionPhotos', linkKey: 'condition' },
+      { photoKey: 'beforePhotos', linkKey: 'before' },
+      { photoKey: 'afterPhotos', linkKey: 'after' }
+    ];
+
+    const driveLinks = {
+      condition: [...(record.driveLinks?.condition || [])],
+      before: [...(record.driveLinks?.before || [])],
+      after: [...(record.driveLinks?.after || [])]
+    };
+
+    const nextPhotos = {
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: []
+    };
+
+    let uploadedCount = 0;
+
+    for (const item of kinds) {
+      const list = record[item.photoKey] || [];
+      for (let i = 0; i < list.length; i++) {
+        const src = list[i];
+        if (typeof src === 'string' && src.startsWith('data:image')) {
+          const fileName = `${record.plate || '차량'}_${item.linkKey}_${i + 1}_${Date.now()}.jpg`;
+          const res = await postToGas({
+            action: 'uploadPhoto',
+            plate: record.plate,
+            model: record.model,
+            category: item.linkKey,
+            fileName: fileName,
+            base64Data: src
+          });
+          if (res && res.ok && res.url) {
+            driveLinks[item.linkKey][i] = res.url;
+            uploadedCount++;
+          } else {
+            nextPhotos[item.photoKey].push(src);
+          }
+        } else if (typeof src === 'string') {
+          nextPhotos[item.photoKey].push(src);
+        }
+      }
+    }
+
+    if (uploadedCount > 0) {
+      showToast(`구글 드라이브에 사진 ${uploadedCount}장 저장 완료`);
+    }
+
+    return {
+      ...record,
+      conditionPhotos: nextPhotos.conditionPhotos,
+      beforePhotos: nextPhotos.beforePhotos,
+      afterPhotos: nextPhotos.afterPhotos,
+      driveLinks: driveLinks
+    };
+  }
 
   function showToast(msg) {
-    const el = $('toast');
+    const el = document.getElementById('toast');
     if (!el) return;
     el.textContent = msg;
     el.classList.add('show');
-    clearTimeout(showToast._timer);
-    showToast._timer = setTimeout(() => el.classList.remove('show'), 2400);
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
   }
 
-  function loadData() {
-    try {
-      const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) {
-        const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) {
-          state.vehicles = parsed;
-        } else {
-          state.vehicles = JSON.parse(JSON.stringify(SAMPLE_VEHICLES));
-          saveVehicles();
-        }
-      } else {
-        state.vehicles = JSON.parse(JSON.stringify(SAMPLE_VEHICLES));
-        saveVehicles();
-      }
-    } catch (e) {
-      state.vehicles = JSON.parse(JSON.stringify(SAMPLE_VEHICLES));
-    }
-
-    try {
-      const syncSaved = localStorage.getItem(SYNC_KEY);
-      if (syncSaved) state.syncConfig = JSON.parse(syncSaved);
-    } catch (e) {}
-
-    updateSyncBadge();
+  function setStatusFilter(status) {
+    state.statusFilter = status;
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    const target = document.getElementById('stat-' + status);
+    if (target) target.classList.add('active');
+    renderAll();
   }
 
-  function saveVehicles() {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.vehicles));
-    } catch (e) {
-      showToast('브라우저 저장 공간 한도를 초과했습니다.');
-    }
-  }
+  function populatePartnerSelects() {
+    const filterSel = document.getElementById('partnerFilter');
+    const formSel = document.getElementById('fPartner');
+    const authSel = document.getElementById('partnerAuthSelect');
 
-  function updateSyncBadge() {
-    const badge = $('syncStatusBadge');
-    if (!badge) return;
-    if (state.syncConfig && state.syncConfig.gasUrl && state.syncConfig.gasUrl.trim()) {
-      badge.textContent = '☁️ 시트 연동됨';
+    const prevFilter = filterSel.value;
+    const prevForm = formSel.value;
+
+    if (state.config.role === 'PARTNER' && state.config.activePartner) {
+      filterSel.innerHTML = `<option value="${escapeHtml(state.config.activePartner)}">${escapeHtml(state.config.activePartner)}</option>`;
+      filterSel.disabled = true;
+      formSel.innerHTML = `<option value="${escapeHtml(state.config.activePartner)}">${escapeHtml(state.config.activePartner)}</option>`;
     } else {
-      badge.textContent = '⚡ 동기화 대기';
-    }
-  }
+      filterSel.disabled = false;
+      filterSel.innerHTML = `<option value="ALL">거래처: 전체</option>` +
+        state.partners.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
+      if (prevFilter && Array.from(filterSel.options).some(o => o.value === prevFilter)) {
+        filterSel.value = prevFilter;
+      }
 
-  function getPartnerName(id) {
-    const found = PARTNERS.find(p => p.id === id);
-    return found ? found.name : id;
-  }
-
-  function populateSelects() {
-    const partnerFilter = $('partnerFilter');
-    if (partnerFilter) {
-      partnerFilter.innerHTML = PARTNERS.map(p =>
-        `<option value="${p.id}">${p.id === 'ALL' ? '의뢰 거래처: 전체' : p.name}</option>`
-      ).join('');
-      partnerFilter.value = state.partnerFilter;
+      formSel.innerHTML = state.partners.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
+      if (prevForm && Array.from(formSel.options).some(o => o.value === prevForm)) {
+        formSel.value = prevForm;
+      }
     }
 
-    const fPartner = $('fPartner');
-    if (fPartner) {
-      fPartner.innerHTML = PARTNERS.filter(p => p.id !== 'ALL').map(p =>
-        `<option value="${p.id}">${p.name}</option>`
-      ).join('');
-    }
-
-    const partnerAuthSelect = $('partnerAuthSelect');
-    if (partnerAuthSelect) {
-      partnerAuthSelect.innerHTML = PARTNERS.filter(p => p.id !== 'ALL').map(p =>
-        `<option value="${p.id}">${p.name}</option>`
-      ).join('');
-    }
-
-    const codeBody = $('partnerCodeTableBody');
-    if (codeBody) {
-      codeBody.innerHTML = PARTNERS.filter(p => p.id !== 'ALL').map(p =>
-        `<tr><td>${p.name}</td><td><code>${p.code}</code></td></tr>`
-      ).join('');
-    }
+    authSel.innerHTML = state.partners.map(p => `<option value="${escapeHtml(p.name)}">${escapeHtml(p.name)}</option>`).join('');
+    onPartnerAuthChange();
   }
 
   function renderDamagePicker() {
-    const picker = $('damagePicker');
-    if (!picker) return;
-    picker.innerHTML = DAMAGE_PARTS.map(part => {
-      const active = state.selectedDamages.includes(part);
-      return `<button type="button" class="dmg-btn ${active ? 'selected' : ''}" data-dmg="${part}">${active ? '✓ ' : ''}${part}</button>`;
+    const wrap = document.getElementById('damagePicker');
+    wrap.innerHTML = DAMAGE_PARTS.map((part, idx) => {
+      const active = state.tempDamages.includes(part);
+      return `<button type="button" class="dmg-btn ${active ? 'selected' : ''}" data-dmg-idx="${idx}">
+        ${active ? '✓ ' : '+ '}${escapeHtml(part)}
+      </button>`;
     }).join('');
-
-    picker.querySelectorAll('.dmg-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const part = btn.getAttribute('data-dmg');
-        if (state.selectedDamages.includes(part)) {
-          state.selectedDamages = state.selectedDamages.filter(x => x !== part);
-        } else {
-          state.selectedDamages.push(part);
-        }
-        renderDamagePicker();
-      });
-    });
   }
 
-  function getFilteredVehicles() {
-    const q = (state.search || '').trim().toLowerCase();
-    return state.vehicles.filter(v => {
-      if (state.mode === 'PARTNER' && state.activePartner !== 'ALL' && v.partner !== state.activePartner) {
-        return false;
-      }
-      if (state.partnerFilter !== 'ALL' && v.partner !== state.partnerFilter) {
-        return false;
-      }
-      if (state.statusFilter !== 'ALL' && v.status !== state.statusFilter) {
-        return false;
-      }
-      if (state.typeFilter !== 'ALL' && v.type !== state.typeFilter) {
-        return false;
-      }
-      if (state.rentalFilter === 'RENTAL' && !v.rental) return false;
-      if (state.rentalFilter === 'NO_RENTAL' && v.rental) return false;
+  function toggleDamageByIndex(idx) {
+    const part = DAMAGE_PARTS[idx];
+    if (!part) return;
+    if (state.tempDamages.includes(part)) {
+      state.tempDamages = state.tempDamages.filter(d => d !== part);
+    } else {
+      state.tempDamages.push(part);
+    }
+    renderDamagePicker();
+  }
 
+  function renderStats(list) {
+    document.getElementById('cnt-ALL').textContent = list.length;
+    document.getElementById('cnt-WAIT').textContent = list.filter(v => v.status === '입고·견적 대기').length;
+    document.getElementById('cnt-METAL').textContent = list.filter(v => v.status === '판금 진행').length;
+    document.getElementById('cnt-PAINT').textContent = list.filter(v => v.status === '도장 진행').length;
+    document.getElementById('cnt-DONE').textContent = list.filter(v => v.status === '출고 대기·완료').length;
+  }
+
+  function getVisibleVehicles() {
+    const q = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+    const partnerVal = document.getElementById('partnerFilter').value;
+    const typeVal = document.getElementById('typeFilter').value;
+    const rentalVal = document.getElementById('rentalFilter').value;
+
+    let base = state.vehicles;
+    if (state.config.role === 'PARTNER' && state.config.activePartner) {
+      base = base.filter(v => v.partner === state.config.activePartner);
+    }
+    renderStats(base);
+
+    return base.filter(v => {
+      if (state.statusFilter !== 'ALL' && v.status !== state.statusFilter) return false;
+      if (state.config.role !== 'PARTNER' && partnerVal !== 'ALL' && v.partner !== partnerVal) return false;
+      if (typeVal !== 'ALL' && v.type !== typeVal) return false;
+      if (rentalVal === 'RENTAL' && !v.rental) return false;
+      if (rentalVal === 'NO_RENTAL' && v.rental) return false;
       if (q) {
         const hay = [
-          v.plate, v.model, v.customer, v.phone,
-          v.insurance, v.claimNo, v.tech, v.memo, getPartnerName(v.partner)
-        ].filter(Boolean).join(' ').toLowerCase();
+          v.plate, v.model, v.customer, v.phone, v.insurance, v.claimNo, v.tech, v.partner, v.memo,
+          ...(v.damages || [])
+        ].join(' ').toLowerCase();
         if (!hay.includes(q)) return false;
       }
       return true;
     });
   }
 
-  function updateStats() {
-    const baseList = state.vehicles.filter(v =>
-      state.mode === 'PARTNER' && state.activePartner !== 'ALL' ? v.partner === state.activePartner : true
-    );
-    $('cnt-ALL').textContent = baseList.length;
-    $('cnt-WAIT').textContent = baseList.filter(v => v.status === '입고·견적 대기').length;
-    $('cnt-METAL').textContent = baseList.filter(v => v.status === '판금 진행').length;
-    $('cnt-PAINT').textContent = baseList.filter(v => v.status === '도장 진행').length;
-    $('cnt-DONE').textContent = baseList.filter(v => v.status === '출고 대기·완료').length;
-
-    document.querySelectorAll('.stat-card').forEach(card => {
-      card.classList.toggle('active', card.getAttribute('data-status') === state.statusFilter);
-    });
-  }
-
-  function getStatusPillClass(status) {
+  function statusPillClass(status) {
     if (status === '입고·견적 대기') return 'st-wait';
-    if (status === '출고 대기·완료') return 'st-done';
-    return 'st-work';
+    if (status === '판금 진행' || status === '도장 진행') return 'st-work';
+    return 'st-done';
   }
 
-  function renderVehicles() {
-    updateStats();
-    const listEl = $('vehicleList');
-    const filtered = getFilteredVehicles();
-    $('resultCountText').textContent = `조회된 차량: ${filtered.length}대`;
+  function renderAll() {
+    const badge = document.getElementById('modeBadge');
+    const adminBtn = document.getElementById('btnAdminMode');
+    const partnerBtn = document.getElementById('btnPartnerMode');
+    const syncBadge = document.getElementById('syncStatusBadge');
 
-    if (!filtered.length) {
-      listEl.innerHTML = `<div class="empty-box">조건에 맞는 입고 차량이 없습니다.<br>새 차량을 등록하거나 필터를 초기화해 보세요.</div>`;
+    if (state.config.syncEndpoint) {
+      syncBadge.textContent = '☁️ 시트·드라이브 연결됨';
+    } else {
+      syncBadge.textContent = '⚡ 실시간 동기화 준비됨';
+    }
+
+    const syncBtn = document.getElementById('btnSyncCode');
+    const restoreBtn = document.getElementById('btnRestoreSample');
+    const newVehicleBtn = document.getElementById('btnNewVehicle');
+    const roBanner = document.getElementById('partnerReadOnlyBanner');
+    if (state.config.role === 'PARTNER' && state.config.activePartner) {
+      if (roBanner) {
+        roBanner.textContent = `🔒 ${state.config.activePartner} 전용 읽기 전용 화면입니다. 조회·사진 확대·안내문자 복사만 가능하며 등록·수정·삭제는 관리자 전용입니다.`;
+        roBanner.classList.add('show');
+      }
+      badge.textContent = `거래처 전용 (읽기 전용) · ${state.config.activePartner}`;
+      badge.className = 'mode-pill partner';
+      adminBtn.className = 'soft-gray';
+      partnerBtn.className = 'primary';
+      if (syncBtn) syncBtn.style.display = 'none';
+      if (restoreBtn) restoreBtn.style.display = 'none';
+      if (newVehicleBtn) newVehicleBtn.style.display = 'none';
+    } else {
+      if (roBanner) {
+        roBanner.classList.remove('show');
+      }
+      badge.textContent = '관리자 모드 (전체)';
+      badge.className = 'mode-pill';
+      adminBtn.className = 'primary';
+      partnerBtn.className = 'soft-gray';
+      if (syncBtn) syncBtn.style.display = '';
+      if (restoreBtn) restoreBtn.style.display = '';
+      if (newVehicleBtn) newVehicleBtn.style.display = '';
+    }
+
+    populatePartnerSelects();
+    const items = getVisibleVehicles();
+    document.getElementById('resultCountText').textContent = `조회된 차량: ${items.length}대`;
+
+    const container = document.getElementById('vehicleList');
+    if (!items.length) {
+      container.innerHTML = `<div class="empty-box">조건에 맞는 입고 차량 내역이 없습니다.</div>`;
       return;
     }
 
-    listEl.innerHTML = filtered.map(v => {
+    container.innerHTML = items.map(v => {
       const dmgHtml = (v.damages && v.damages.length)
-        ? `<div class="damage-tags">${v.damages.map(d => `<span class="d-tag">${d}</span>`).join('')}</div>`
+        ? `<div class="damage-tags">${v.damages.map(d => `<span class="d-tag">${escapeHtml(d)}</span>`).join('')}</div>`
         : '';
 
-      const allPhotos = [
-        ...(v.photos?.condition || []).map((src, i) => ({ src, tag: `컨디션 ${i + 1}` })),
-        ...(v.photos?.before || []).map((src, i) => ({ src, tag: `작업전 ${i + 1}` })),
-        ...(v.photos?.after || []).map((src, i) => ({ src, tag: `작업후 ${i + 1}` }))
+      const thumbs = [
+        ...(v.conditionPhotos || []).map((src, i) => ({ src, label: '컨디션', cls: 'cond', kind: 'condition', idx: i })),
+        ...(v.beforePhotos || []).map((src, i) => ({ src, label: '작업전', cls: '', kind: 'before', idx: i })),
+        ...(v.afterPhotos || []).map((src, i) => ({ src, label: '작업후', cls: '', kind: 'after', idx: i }))
       ];
 
-      const photoHtml = allPhotos.length
-        ? `<div class="v-photos-preview">${allPhotos.map(p =>
-            `<div class="thumb-box" data-view-src="${p.src}" data-view-tag="${v.plate} - ${p.tag}">
-              <img src="${p.src}" alt="${p.tag}">
-              <span class="thumb-tag">${p.tag}</span>
-            </div>`
-          ).join('')}</div>`
+      const driveChips = [
+        ...(v.driveLinks?.condition || []).map((url, i) => ({ url, label: `📁 컨디션 ${i + 1}` })),
+        ...(v.driveLinks?.before || []).map((url, i) => ({ url, label: `📁 작업전 ${i + 1}` })),
+        ...(v.driveLinks?.after || []).map((url, i) => ({ url, label: `📁 작업후 ${i + 1}` }))
+      ].filter(x => x && x.url);
+
+      const photoHtml = (thumbs.length || driveChips.length)
+        ? `<div class="v-photos-preview">
+            ${thumbs.map(t => `
+              <div class="thumb-box" data-view-vid="${escapeHtml(v.id)}" data-view-kind="${t.kind}" data-view-idx="${t.idx}">
+                <img src="${t.src}" alt="${t.label}">
+                <span class="thumb-tag ${t.cls}">${t.label}</span>
+              </div>`).join('')}
+            ${driveChips.map(d => `
+              <a class="drive-link-chip" href="${escapeHtml(d.url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(d.label)}</a>
+            `).join('')}
+          </div>`
         : '';
 
-      const isAdmin = state.mode === 'ADMIN';
-      const actionHtml = isAdmin
-        ? `<div class="v-actions">
-            <button type="button" class="small" data-action="cycle" data-id="${v.id}">🔄 공정 변경</button>
-            <button type="button" class="small" data-action="edit" data-id="${v.id}">✏️ 수정</button>
-            <button type="button" class="small soft-gray" data-action="print" data-id="${v.id}">🖨️ 인쇄</button>
-            <button type="button" class="small danger-soft" data-action="delete" data-id="${v.id}">🗑️ 삭제</button>
-          </div>`
-        : `<div class="v-actions">
-            <button type="button" class="small soft-gray" data-action="print" data-id="${v.id}" style="grid-column: span 2;">🖨️ 정비 현황 인쇄</button>
-          </div>`;
-
       return `
-        <article class="v-card">
+        <article class="v-card" data-vid="${escapeHtml(v.id)}">
           <div class="v-top">
             <div>
               <div class="v-badges">
-                <span class="pill ${getStatusPillClass(v.status)}">${v.status}</span>
-                <span class="pill partner">${getPartnerName(v.partner)}</span>
-                <span class="pill type">${v.type}</span>
-                ${v.rental ? `<span class="pill rental">🚗 대차 신청${v.rentalInfo ? ` (${v.rentalInfo})` : ''}</span>` : ''}
+                <span class="pill partner">${escapeHtml(v.partner)}</span>
+                <span class="pill type">${escapeHtml(v.type)}</span>
+                ${v.rental ? `<span class="pill rental">대차: ${escapeHtml(v.rentalInfo || '신청')}</span>` : ''}
               </div>
-              <div class="v-plate">${v.plate} <span class="v-model">· ${v.model}</span></div>
+              <div class="v-plate">${escapeHtml(v.plate)}</div>
+              <div class="v-model">${escapeHtml(v.model)}</div>
             </div>
+            <span class="pill ${statusPillClass(v.status)}">${escapeHtml(v.status)}</span>
           </div>
+
           <div class="v-meta">
-            <div><strong>고객:</strong> ${v.customer || '-'} ${v.phone ? `(${v.phone})` : ''}</div>
-            <div><strong>담당:</strong> ${v.tech || '-'}</div>
-            <div><strong>보험/접수:</strong> ${v.insurance || '-'} ${v.claimNo ? `/ ${v.claimNo}` : ''}</div>
-            <div><strong>출고예정 / 예상액:</strong> ${v.dueDate || '-'} / ${v.estimate ? `${v.estimate}원` : '-'}</div>
+            <div><strong>고객:</strong> ${escapeHtml(v.customer || '-')} (${escapeHtml(v.phone || '-')})</div>
+            <div><strong>담당:</strong> ${escapeHtml(v.tech || '-')}</div>
+            <div><strong>보험사:</strong> ${escapeHtml(v.insurance || '미입력')} ${v.claimNo ? `(${escapeHtml(v.claimNo)})` : ''}</div>
+            <div><strong>출고예정:</strong> ${escapeHtml(v.dueDate || '-')} · <strong>예상금액:</strong> ${escapeHtml(v.estimate ? v.estimate + '원' : '-')}</div>
           </div>
+
           ${dmgHtml}
-          ${v.memo ? `<div class="v-memo">${v.memo}</div>` : ''}
+          ${v.memo ? `<div class="v-memo">${escapeHtml(v.memo)}</div>` : ''}
           ${photoHtml}
-          ${actionHtml}
+
+          <div class="v-actions">
+            ${state.config.role === 'ADMIN' ? `
+              <select class="quick-status-select" aria-label="공정 상태 변경" data-vid="${escapeHtml(v.id)}">
+                <option value="입고·견적 대기" ${v.status === '입고·견적 대기' ? 'selected' : ''}>입고·견적 대기</option>
+                <option value="판금 진행" ${v.status === '판금 진행' ? 'selected' : ''}>판금 진행</option>
+                <option value="도장 진행" ${v.status === '도장 진행' ? 'selected' : ''}>도장 진행</option>
+                <option value="출고 대기·완료" ${v.status === '출고 대기·완료' ? 'selected' : ''}>출고 대기·완료</option>
+              </select>
+              <button type="button" class="small btn-edit-vehicle" data-vid="${escapeHtml(v.id)}">상세·수정</button>
+              <button type="button" class="small btn-copy-sms" data-vid="${escapeHtml(v.id)}">안내문자 복사</button>
+              <button type="button" class="small danger-soft btn-del-vehicle" data-vid="${escapeHtml(v.id)}">삭제</button>
+            ` : `
+              <button type="button" class="small btn-edit-vehicle" data-vid="${escapeHtml(v.id)}">상세 보기</button>
+              <button type="button" class="small btn-copy-sms" data-vid="${escapeHtml(v.id)}">안내문자 복사</button>
+            `}
+          </div>
         </article>
       `;
     }).join('');
-
-    listEl.querySelectorAll('.thumb-box').forEach(box => {
-      box.addEventListener('click', () => {
-        $('photoViewerTitle').textContent = box.getAttribute('data-view-tag') || '사진 보기';
-        $('photoViewerImg').src = box.getAttribute('data-view-src');
-        openModal('photoViewerModal');
-      });
-    });
-
-    listEl.querySelectorAll('button[data-action]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const id = btn.getAttribute('data-id');
-        const action = btn.getAttribute('data-action');
-        if (action === 'cycle') cycleVehicleStatus(id);
-        if (action === 'edit') openVehicleModal(id);
-        if (action === 'delete') deleteVehicle(id);
-        if (action === 'print') window.print();
-      });
-    });
   }
 
-  function cycleVehicleStatus(id) {
-    const order = ['입고·견적 대기', '판금 진행', '도장 진행', '출고 대기·완료'];
-    const target = state.vehicles.find(v => v.id === id);
-    if (!target) return;
-    const idx = order.indexOf(target.status);
-    target.status = order[(idx + 1) % order.length];
-    target.updatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
-    saveVehicles();
-    renderVehicles();
-    showToast(`${target.plate} → ${target.status}`);
+  function resetFilters() {
+    state.statusFilter = 'ALL';
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    const allCard = document.getElementById('stat-ALL');
+    if (allCard) allCard.classList.add('active');
+    document.getElementById('searchInput').value = '';
+    if (state.config.role !== 'PARTNER') {
+      document.getElementById('partnerFilter').value = 'ALL';
+    }
+    document.getElementById('typeFilter').value = 'ALL';
+    document.getElementById('rentalFilter').value = 'ALL';
+    renderAll();
+    showToast('필터가 초기화되었습니다.');
   }
 
-  function deleteVehicle(id) {
-    const target = state.vehicles.find(v => v.id === id);
-    if (!target) return;
-    if (!confirm(`${target.plate} (${target.model}) 입고 내역을 삭제할까요?`)) return;
-    state.vehicles = state.vehicles.filter(v => v.id !== id);
-    saveVehicles();
-    renderVehicles();
-    showToast('차량 내역이 삭제되었습니다.');
+  function openCreateModal() {
+    if (state.config.role === 'PARTNER') {
+      showToast('거래처 전용 모드는 읽기 전용입니다.');
+      return;
+    }
+    document.getElementById('vehicleModalTitle').textContent = '신규 차량 입고';
+    document.getElementById('vehicleForm').reset();
+    document.getElementById('editVehicleId').value = '';
+    document.getElementById('fRentalInfo').style.display = 'none';
+    if (state.config.role === 'PARTNER' && state.config.activePartner) {
+      document.getElementById('fPartner').value = state.config.activePartner;
+    }
+    state.tempConditionPhotos = [];
+    state.tempBeforePhotos = [];
+    state.tempAfterPhotos = [];
+    state.tempDriveLinks = { condition: [], before: [], after: [] };
+    state.tempDamages = [];
+    renderDamagePicker();
+    renderPhotoPreviews();
+    setVehicleModalReadOnly(false);
+    const m = document.getElementById('vehicleModal');
+    if (m) {
+      m.classList.add('open');
+      m.style.display = 'flex';
+    }
+  }
+
+  function setVehicleModalReadOnly(isReadOnly) {
+    const form = document.getElementById('vehicleForm');
+    if (!form) return;
+    form.querySelectorAll('input, select, textarea').forEach(el => {
+      el.disabled = isReadOnly;
+    });
+    ['conditionPhotoInput', 'beforePhotoInput', 'afterPhotoInput'].forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = isReadOnly ? 'none' : '';
+    });
+    form.querySelectorAll('.photo-del').forEach(btn => {
+      btn.style.display = isReadOnly ? 'none' : '';
+    });
+    form.querySelectorAll('.dmg-btn').forEach(btn => {
+      btn.disabled = isReadOnly;
+    });
+    const submitBtn = form.querySelector('button[type="submit"]');
+    if (submitBtn) submitBtn.style.display = isReadOnly ? 'none' : '';
+  }
+
+  function openEditModal(id) {
+    const v = state.vehicles.find(item => item.id === id);
+    if (!v) return;
+    const isPartnerReadOnly = state.config.role === 'PARTNER';
+    document.getElementById('vehicleModalTitle').textContent = isPartnerReadOnly
+      ? `차량 상세 조회 (읽기 전용) · ${v.plate}`
+      : `차량 수정 · ${v.plate}`;
+    document.getElementById('editVehicleId').value = v.id;
+    document.getElementById('fPartner').value = v.partner;
+    document.getElementById('fType').value = v.type;
+    document.getElementById('fPlate').value = v.plate;
+    document.getElementById('fModel').value = v.model;
+    document.getElementById('fCustomer').value = v.customer || '';
+    document.getElementById('fPhone').value = v.phone || '';
+    document.getElementById('fInsurance').value = v.insurance || '';
+    document.getElementById('fClaimNo').value = v.claimNo || '';
+    document.getElementById('fRental').checked = !!v.rental;
+    document.getElementById('fRentalInfo').style.display = v.rental ? 'block' : 'none';
+    document.getElementById('fRentalInfo').value = v.rentalInfo || '';
+    document.getElementById('fStatus').value = v.status;
+    const techSel = document.getElementById('fTech');
+    const cleanTech = sanitizeTechName(v.tech);
+    if (!Array.from(techSel.options).some(o => o.value === cleanTech)) {
+      const opt = document.createElement('option');
+      opt.value = cleanTech;
+      opt.textContent = cleanTech;
+      techSel.appendChild(opt);
+    }
+    techSel.value = cleanTech;
+    document.getElementById('fDueDate').value = v.dueDate || '';
+    document.getElementById('fEstimate').value = v.estimate || '';
+    document.getElementById('fMemo').value = v.memo || '';
+
+    state.tempConditionPhotos = [...(v.conditionPhotos || [])];
+    state.tempBeforePhotos = [...(v.beforePhotos || [])];
+    state.tempAfterPhotos = [...(v.afterPhotos || [])];
+    state.tempDriveLinks = {
+      condition: [...(v.driveLinks?.condition || [])],
+      before: [...(v.driveLinks?.before || [])],
+      after: [...(v.driveLinks?.after || [])]
+    };
+    state.tempDamages = [...(v.damages || [])];
+    renderDamagePicker();
+    renderPhotoPreviews();
+    setVehicleModalReadOnly(isPartnerReadOnly);
+    const m = document.getElementById('vehicleModal');
+    if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+  }
+
+  function toggleRentalInput() {
+    const checked = document.getElementById('fRental').checked;
+    document.getElementById('fRentalInfo').style.display = checked ? 'block' : 'none';
+  }
+
+  function getTempPhotoArray(kind) {
+    if (kind === 'condition') return state.tempConditionPhotos;
+    if (kind === 'before') return state.tempBeforePhotos;
+    return state.tempAfterPhotos;
+  }
+
+  function compressImage(file, callback) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 1024;
+        const scale = img.width > maxW ? maxW / img.width : 1;
+        const canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.width * scale));
+        canvas.height = Math.max(1, Math.round(img.height * scale));
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        callback(canvas.toDataURL('image/jpeg', 0.72));
+      };
+      img.onerror = () => callback(e.target.result);
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function handlePhotoUpload(event, kind) {
+    const files = Array.from(event.target.files || []);
+    const targetArr = getTempPhotoArray(kind);
+    const remaining = MAX_PHOTOS_PER_TYPE - targetArr.length;
+
+    if (remaining <= 0) {
+      showToast(`최대 ${MAX_PHOTOS_PER_TYPE}장까지만 등록할 수 있습니다.`);
+      event.target.value = '';
+      return;
+    }
+
+    const sliceFiles = files.slice(0, remaining);
+    if (files.length > remaining) {
+      showToast(`최대 ${MAX_PHOTOS_PER_TYPE}장 한도로 ${sliceFiles.length}장만 추가됩니다.`);
+    }
+
+    sliceFiles.forEach(file => {
+      compressImage(file, (dataUrl) => {
+        const arr = getTempPhotoArray(kind);
+        if (arr.length < MAX_PHOTOS_PER_TYPE) {
+          arr.push(dataUrl);
+          renderPhotoPreviews();
+        }
+      });
+    });
+    event.target.value = '';
   }
 
   function renderPhotoPreviews() {
-    const map = [
-      { key: 'condition', elId: 'conditionPhotoPreview' },
-      { key: 'before', elId: 'beforePhotoPreview' },
-      { key: 'after', elId: 'afterPhotoPreview' }
-    ];
-    map.forEach(({ key, elId }) => {
-      const container = $(elId);
-      if (!container) return;
-      const arr = state.draftPhotos[key] || [];
-      container.innerHTML = arr.map((src, idx) => `
-        <div class="photo-item">
-          <img src="${src}" alt="${key}-${idx}">
-          <button type="button" class="photo-del" data-p-key="${key}" data-p-idx="${idx}">✕</button>
-        </div>
-      `).join('');
+    document.getElementById('conditionCountBadge').textContent = `${state.tempConditionPhotos.length} / ${MAX_PHOTOS_PER_TYPE}장`;
+    document.getElementById('beforeCountBadge').textContent = `${state.tempBeforePhotos.length} / ${MAX_PHOTOS_PER_TYPE}장`;
+    document.getElementById('afterCountBadge').textContent = `${state.tempAfterPhotos.length} / ${MAX_PHOTOS_PER_TYPE}장`;
 
-      container.querySelectorAll('.photo-del').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const k = btn.getAttribute('data-p-key');
-          const i = Number(btn.getAttribute('data-p-idx'));
-          state.draftPhotos[k].splice(i, 1);
-          renderPhotoPreviews();
-        });
-      });
-    });
+    const renderGrid = (arr, kind, altText) => arr.map((src, idx) => `
+      <div class="photo-item">
+        <img src="${src}" alt="${altText}">
+        <button type="button" class="photo-del" data-del-kind="${kind}" data-del-idx="${idx}">✕</button>
+      </div>
+    `).join('');
+
+    document.getElementById('conditionPhotoPreview').innerHTML = renderGrid(state.tempConditionPhotos, 'condition', '컨디션 체크');
+    document.getElementById('beforePhotoPreview').innerHTML = renderGrid(state.tempBeforePhotos, 'before', '작업전');
+    document.getElementById('afterPhotoPreview').innerHTML = renderGrid(state.tempAfterPhotos, 'after', '작업후');
   }
 
-  function handlePhotoInput(inputId, key) {
-    const input = $(inputId);
-    if (!input) return;
-    input.addEventListener('change', (e) => {
-      const files = Array.from(e.target.files || []);
-      const remain = 10 - state.draftPhotos[key].length;
-      if (remain <= 0) {
-        showToast('사진은 최대 10장까지 등록할 수 있습니다.');
-        input.value = '';
-        return;
-      }
-      const chosen = files.slice(0, remain);
-      chosen.forEach(file => {
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-          state.draftPhotos[key].push(ev.target.result);
-          renderPhotoPreviews();
-        };
-        reader.readAsDataURL(file);
-      });
-      input.value = '';
-    });
+  function removeTempPhoto(kind, idx) {
+    const arr = getTempPhotoArray(kind);
+    arr.splice(idx, 1);
+    if (Array.isArray(state.tempDriveLinks[kind])) {
+      state.tempDriveLinks[kind].splice(idx, 1);
+    }
+    renderPhotoPreviews();
   }
 
-  function openVehicleModal(editId = null) {
-    if (state.mode !== 'ADMIN') {
-      showToast('관리자 모드에서만 차량을 등록·수정할 수 있습니다.');
+  async function saveVehicle(event) {
+    event.preventDefault();
+    if (state.config.role === 'PARTNER') {
+      showToast('거래처 전용 모드는 읽기 전용입니다.');
       return;
     }
-    const form = $('vehicleForm');
-    form.reset();
-    $('fRentalInfo').style.display = 'none';
 
-    if (editId) {
-      const v = state.vehicles.find(x => x.id === editId);
-      if (!v) return;
-      $('vehicleModalTitle').textContent = `차량 수정 · ${v.plate}`;
-      $('editVehicleId').value = v.id;
-      $('fPartner').value = v.partner || 'GENERAL';
-      $('fType').value = v.type || '보험수리';
-      $('fPlate').value = v.plate || '';
-      $('fModel').value = v.model || '';
-      $('fCustomer').value = v.customer || '';
-      $('fPhone').value = v.phone || '';
-      $('fInsurance').value = v.insurance || '';
-      $('fClaimNo').value = v.claimNo || '';
-      $('fRental').checked = !!v.rental;
-      $('fRentalInfo').style.display = v.rental ? 'block' : 'none';
-      $('fRentalInfo').value = v.rentalInfo || '';
-      $('fStatus').value = v.status || '입고·견적 대기';
-      $('fTech').value = v.tech || '판금부 최성윤 팀장';
-      $('fDueDate').value = v.dueDate || '';
-      $('fEstimate').value = v.estimate || '';
-      $('fMemo').value = v.memo || '';
-      state.selectedDamages = Array.isArray(v.damages) ? [...v.damages] : [];
-      state.draftPhotos = {
-        condition: [...(v.photos?.condition || [])],
-        before: [...(v.photos?.before || [])],
-        after: [...(v.photos?.after || [])]
-      };
-    } else {
-      $('vehicleModalTitle').textContent = '신규 차량 입고';
-      $('editVehicleId').value = '';
-      state.selectedDamages = [];
-      state.draftPhotos = { condition: [], before: [], after: [] };
-    }
+    const submitBtn = document.getElementById('btnSubmitVehicle');
+    if (submitBtn) submitBtn.disabled = true;
 
-    renderDamagePicker();
-    renderPhotoPreviews();
-    openModal('vehicleModal');
-  }
-
-  function openModal(id) {
-    const el = $(id);
-    if (el) el.classList.add('open');
-  }
-
-  function closeModal(id) {
-    const el = $(id);
-    if (el) el.classList.remove('open');
-  }
-
-  function updateModeUI() {
-    const badge = $('modeBadge');
-    const banner = $('partnerReadOnlyBanner');
-    const btnAdmin = $('btnAdminMode');
-    const btnPartner = $('btnPartnerMode');
-    const btnNew = $('btnNewVehicle');
-
-    if (state.mode === 'ADMIN') {
-      badge.textContent = '관리자 모드';
-      badge.classList.remove('partner');
-      banner.classList.remove('show');
-      btnAdmin.className = 'primary';
-      btnPartner.className = 'soft-gray';
-      btnNew.disabled = false;
-    } else {
-      const pName = getPartnerName(state.activePartner);
-      badge.textContent = `거래처 모드 · ${pName}`;
-      badge.classList.add('partner');
-      banner.textContent = `현재 [${pName}] 조회 전용 모드로 열려 있습니다. 등록/수정/삭제는 관리자 모드로 전환해 주세요.`;
-      banner.classList.add('show');
-      btnAdmin.className = 'soft-gray';
-      btnPartner.className = 'primary';
-      btnNew.disabled = true;
-    }
-    renderVehicles();
-  }
-
-  function bindEvents() {
-    document.querySelectorAll('[data-close-modal]').forEach(btn => {
-      btn.addEventListener('click', () => closeModal(btn.getAttribute('data-close-modal')));
-    });
-
-    document.querySelectorAll('.modal-backdrop').forEach(backdrop => {
-      backdrop.addEventListener('click', (e) => {
-        if (e.target === backdrop) backdrop.classList.remove('open');
-      });
-    });
-
-    $('btnAdminMode').addEventListener('click', () => {
-      if (state.mode === 'ADMIN') {
-        showToast('이미 관리자 모드입니다.');
-        return;
-      }
-      $('adminPinInput').value = '';
-      openModal('adminModal');
-    });
-
-    $('btnConfirmAdmin').addEventListener('click', () => {
-      const pin = ($('adminPinInput').value || '').trim();
-      if (pin !== ADMIN_PIN && pin !== '') {
-        showToast('관리자 PIN이 일치하지 않습니다. (초기값: ACRO-0000)');
-        return;
-      }
-      state.mode = 'ADMIN';
-      state.activePartner = 'ALL';
-      closeModal('adminModal');
-      updateModeUI();
-      showToast('관리자 모드로 전환되었습니다.');
-    });
-
-    $('btnPartnerMode').addEventListener('click', () => {
-      $('partnerPinInput').value = '';
-      openModal('partnerModal');
-    });
-
-    $('btnSwitchPartner').addEventListener('click', () => {
-      const selectedId = $('partnerAuthSelect').value;
-      const partnerObj = PARTNERS.find(p => p.id === selectedId);
-      const code = ($('partnerPinInput').value || '').trim();
-      if (code && partnerObj && code !== partnerObj.code) {
-        showToast(`접속 코드가 일치하지 않습니다. (예시 코드: ${partnerObj.code})`);
-        return;
-      }
-      state.mode = 'PARTNER';
-      state.activePartner = selectedId;
-      state.partnerFilter = selectedId;
-      $('partnerFilter').value = selectedId;
-      closeModal('partnerModal');
-      updateModeUI();
-      showToast(`${partnerObj ? partnerObj.name : '거래처'} 모드로 전환되었습니다.`);
-    });
-
-    $('btnSyncCode').addEventListener('click', () => {
-      $('gasUrlInput').value = state.syncConfig.gasUrl || '';
-      openModal('syncModal');
-    });
-
-    $('btnSaveSync').addEventListener('click', () => {
-      state.syncConfig.gasUrl = ($('gasUrlInput').value || '').trim();
-      localStorage.setItem(SYNC_KEY, JSON.stringify(state.syncConfig));
-      updateSyncBadge();
-      closeModal('syncModal');
-      showToast('동기화 설정이 저장되었습니다.');
-    });
-
-    $('btnTestSync').addEventListener('click', async () => {
-      const url = ($('gasUrlInput').value || '').trim();
-      state.syncConfig.gasUrl = url;
-      localStorage.setItem(SYNC_KEY, JSON.stringify(state.syncConfig));
-      updateSyncBadge();
-      if (!url) {
-        showToast('로컬 저장소(localStorage) 기준으로 최신 상태가 유지됩니다.');
-        return;
-      }
-      try {
-        showToast('구글 시트 연결 확인 중...');
-        await fetch(url, {
-          method: 'POST',
-          mode: 'no-cors',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'ping', count: state.vehicles.length })
-        });
-        showToast('동기화 요청을 전송했습니다.');
-      } catch (err) {
-        showToast('연결 중 오류가 발생했습니다. URL을 확인해 주세요.');
-      }
-    });
-
-    $('btnSaveHtml').addEventListener('click', () => {
-      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `ACRO_MOTORS_${new Date().toISOString().slice(0, 10)}.html`;
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('.html 파일이 다운로드되었습니다.');
-    });
-
-    $('btnNewVehicle').addEventListener('click', () => openVehicleModal(null));
-
-    $('fRental').addEventListener('change', (e) => {
-      $('fRentalInfo').style.display = e.target.checked ? 'block' : 'none';
-    });
-
-    $('vehicleForm').addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (state.mode !== 'ADMIN') return;
-
-      const editId = $('editVehicleId').value;
-      const record = {
-        id: editId || ('v-' + Date.now()),
-        partner: $('fPartner').value,
-        type: $('fType').value,
-        plate: $('fPlate').value.trim(),
-        model: $('fModel').value.trim(),
-        customer: $('fCustomer').value.trim(),
-        phone: $('fPhone').value.trim(),
-        insurance: $('fInsurance').value.trim(),
-        claimNo: $('fClaimNo').value.trim(),
-        rental: $('fRental').checked,
-        rentalInfo: $('fRental').checked ? $('fRentalInfo').value.trim() : '',
-        status: $('fStatus').value,
-        tech: $('fTech').value,
-        dueDate: $('fDueDate').value,
-        estimate: $('fEstimate').value.trim(),
-        damages: [...state.selectedDamages],
-        memo: $('fMemo').value.trim(),
-        photos: {
-          condition: [...state.draftPhotos.condition],
-          before: [...state.draftPhotos.before],
-          after: [...state.draftPhotos.after]
+    try {
+      const id = document.getElementById('editVehicleId').value;
+      let payload = {
+        id: id || ('v-' + Date.now()),
+        partner: sanitizePartnerName(document.getElementById('fPartner').value),
+        type: document.getElementById('fType').value,
+        plate: document.getElementById('fPlate').value.trim(),
+        model: document.getElementById('fModel').value.trim(),
+        customer: document.getElementById('fCustomer').value.trim(),
+        phone: document.getElementById('fPhone').value.trim(),
+        insurance: document.getElementById('fInsurance').value.trim(),
+        claimNo: document.getElementById('fClaimNo').value.trim(),
+        rental: document.getElementById('fRental').checked,
+        rentalInfo: document.getElementById('fRental').checked ? document.getElementById('fRentalInfo').value.trim() : '',
+        status: document.getElementById('fStatus').value,
+        tech: document.getElementById('fTech').value,
+        dueDate: document.getElementById('fDueDate').value,
+        estimate: document.getElementById('fEstimate').value.trim(),
+        damages: [...state.tempDamages],
+        memo: document.getElementById('fMemo').value.trim(),
+        conditionPhotos: state.tempConditionPhotos.slice(0, MAX_PHOTOS_PER_TYPE),
+        beforePhotos: state.tempBeforePhotos.slice(0, MAX_PHOTOS_PER_TYPE),
+        afterPhotos: state.tempAfterPhotos.slice(0, MAX_PHOTOS_PER_TYPE),
+        driveLinks: {
+          condition: [...(state.tempDriveLinks.condition || [])],
+          before: [...(state.tempDriveLinks.before || [])],
+          after: [...(state.tempDriveLinks.after || [])]
         },
+        createdAt: id ? ((state.vehicles.find(v => v.id === id) || {}).createdAt || new Date().toISOString().slice(0, 16).replace('T', ' ')) : new Date().toISOString().slice(0, 16).replace('T', ' '),
         updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
       };
 
-      if (!record.plate || !record.model) {
-        showToast('차량번호와 차종을 입력해 주세요.');
+      if (state.config.syncEndpoint) {
+        showToast('구글 드라이브에 사진 저장 중...');
+        payload = await uploadPhotosToDrive(payload);
+      }
+
+      if (id) {
+        state.vehicles = state.vehicles.map(v => v.id === id ? payload : v);
+        showToast('차량 정보가 수정되었습니다.');
+      } else {
+        state.vehicles.unshift(payload);
+        showToast('신규 차량이 입고 등록되었습니다.');
+      }
+
+      saveStorage(true, payload, null);
+      closeModal('vehicleModal');
+      renderAll();
+    } finally {
+      if (submitBtn) submitBtn.disabled = false;
+    }
+  }
+
+  function quickStatusChange(id, newStatus) {
+    if (state.config.role === 'PARTNER') return;
+    let updatedItem = null;
+    state.vehicles = state.vehicles.map(v => {
+      if (v.id === id) {
+        updatedItem = { ...v, status: newStatus, updatedAt: new Date().toISOString().slice(0, 16).replace('T', ' ') };
+        return updatedItem;
+      }
+      return v;
+    });
+    saveStorage(true, updatedItem, null);
+    renderAll();
+    showToast(`공정이 '${newStatus}'(으)로 변경되었습니다.`);
+  }
+
+  function deleteVehicle(id) {
+    if (state.config.role === 'PARTNER') return;
+    if (!confirm('해당 차량 입고 내역을 삭제하시겠습니까?')) return;
+    state.vehicles = state.vehicles.filter(v => v.id !== id);
+    saveStorage(true, null, id);
+    renderAll();
+    showToast('삭제되었습니다.');
+  }
+
+  function copyCustomerSms(id) {
+    const v = state.vehicles.find(item => item.id === id);
+    if (!v) return;
+    const dmgText = (v.damages && v.damages.length) ? `\n손상부위: ${v.damages.join(', ')}` : '';
+    const insText = v.insurance ? `\n보험사: ${v.insurance}${v.claimNo ? ` (${v.claimNo})` : ''}` : '';
+    const msg = `[ACRO 아크로 공업사] ${v.customer || '고객'}님 차량(${v.plate} / ${v.model}) 현재 공정은 [${v.status}]입니다.${insText}${dmgText}${v.dueDate ? `\n출고예정일: ${v.dueDate}` : ''}`;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(msg).then(() => showToast('고객 안내 문자가 복사되었습니다.')).catch(() => fallbackCopy(msg));
+    } else {
+      fallbackCopy(msg);
+    }
+  }
+
+  function fallbackCopy(text) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } catch (e) {}
+    document.body.removeChild(ta);
+    showToast('고객 안내 문자가 복사되었습니다.');
+  }
+
+  function openPartnerModal() {
+    populatePartnerSelects();
+    const m = document.getElementById('partnerModal');
+    if (m) {
+      m.classList.add('open');
+      m.style.display = 'flex';
+    }
+  }
+
+  function onPartnerAuthChange() {
+    const name = document.getElementById('partnerAuthSelect').value;
+    const p = state.partners.find(item => item.name === name);
+    const hintEl = document.getElementById('partnerPinHint');
+    if (state.config.role === 'ADMIN') {
+      hintEl.textContent = p ? `관리자 확인용 접속 코드: ${p.code}` : '';
+    } else {
+      hintEl.textContent = '아크로 공업사에서 안내받은 거래처 접속 코드를 입력하세요.';
+    }
+  }
+
+  function requestAdminMode() {
+    if (state.config.role === 'ADMIN') {
+      showToast('현재 관리자 모드로 접속 중입니다.');
+      return;
+    }
+    document.getElementById('adminPinInput').value = '';
+    const m = document.getElementById('adminModal');
+    if (m) {
+      m.classList.add('open');
+      m.style.display = 'flex';
+    }
+  }
+
+  function confirmAdminLogin() {
+    const entered = (document.getElementById('adminPinInput').value || '').trim().toUpperCase();
+    const expected = (state.config.adminPin || DEFAULT_ADMIN_PIN).trim().toUpperCase();
+    if (!entered || entered !== expected) {
+      showToast('관리자 비밀번호가 일치하지 않습니다.');
+      return;
+    }
+    state.config.role = 'ADMIN';
+    state.config.activePartner = '';
+    state.config.lockedPartner = false;
+    saveStorage(false);
+    closeModal('adminModal');
+    renderAll();
+    showToast('관리자 모드로 인증되었습니다. 모든 거래처 차량을 볼 수 있습니다.');
+  }
+
+  function switchToPartner(directName = '') {
+    const name = directName || document.getElementById('partnerAuthSelect').value;
+    const inputCode = directName ? '' : (document.getElementById('partnerPinInput').value || '').trim().toUpperCase();
+    const p = state.partners.find(item => item.name === name);
+    if (!p) return;
+    if (!directName) {
+      if (!inputCode || inputCode !== p.code.toUpperCase()) {
+        showToast('거래처 접속 코드가 올바르지 않습니다.');
         return;
       }
+    }
+    state.config.role = 'PARTNER';
+    state.config.activePartner = p.name;
+    state.config.lockedPartner = true;
+    saveStorage(false);
+    closeModal('partnerModal');
+    closeModal('syncModal');
+    renderAll();
+    showToast(`${p.name} 전용 모드입니다. 해당 거래처 입고 차량만 표시됩니다.`);
+  }
 
-      if (editId) {
-        const idx = state.vehicles.findIndex(x => x.id === editId);
-        if (idx > -1) state.vehicles[idx] = record;
-        showToast(`${record.plate} 정보가 수정되었습니다.`);
-      } else {
-        state.vehicles.unshift(record);
-        showToast(`${record.plate} 차량이 입고 등록되었습니다.`);
+  function buildPartnerShareUrl(partnerObj) {
+    const base = window.location.origin && window.location.origin !== 'null'
+      ? (window.location.origin + window.location.pathname)
+      : 'https://hanbi0011.github.io/Acro/';
+    const params = new URLSearchParams();
+    params.set('partner', partnerObj.name);
+    params.set('code', partnerObj.code);
+    if (state.config.syncEndpoint) {
+      params.set('sync', state.config.syncEndpoint);
+    }
+    return `${base}?${params.toString()}`;
+  }
+
+  function copyPartnerShareLink(partnerName) {
+    const p = state.partners.find(item => item.name === partnerName);
+    if (!p) return;
+    const shareUrl = buildPartnerShareUrl(p);
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(shareUrl)
+        .then(() => showToast(`${p.name} 전용 접속 링크가 복사되었습니다.`))
+        .catch(() => fallbackCopy(shareUrl));
+    } else {
+      fallbackCopy(shareUrl);
+    }
+  }
+
+  function renderPartnerCodeTable() {
+    const tbody = document.getElementById('partnerCodeTableBody');
+    tbody.innerHTML = state.partners.map(p => `
+      <tr>
+        <td><strong>${escapeHtml(p.name)}</strong></td>
+        <td><code>${escapeHtml(p.code)}</code></td>
+        <td><button type="button" class="small btn-copy-partner-link" data-pname="${escapeHtml(p.name)}">링크 복사</button></td>
+        <td><button type="button" class="small btn-quick-partner" data-pname="${escapeHtml(p.name)}">미리보기</button></td>
+      </tr>
+    `).join('');
+  }
+
+  function openSyncModal() {
+    if (state.config.role !== 'ADMIN') {
+      requestAdminMode();
+      return;
+    }
+    document.getElementById('syncEndpointInput').value = state.config.syncEndpoint || '';
+    document.getElementById('adminPinSettingInput').value = state.config.adminPin || DEFAULT_ADMIN_PIN;
+    renderPartnerCodeTable();
+    const m = document.getElementById('syncModal');
+    if (m) {
+      m.classList.add('open');
+      m.style.display = 'flex';
+    }
+  }
+
+  function saveSyncEndpoint() {
+    const inputUrl = (document.getElementById('syncEndpointInput').value || '').trim();
+    if (inputUrl && inputUrl.indexOf('/macros/echo') !== -1) {
+      showToast('구글 시트 배포용 /exec URL을 입력해 주세요.');
+      return;
+    }
+    state.config.syncEndpoint = inputUrl;
+    const newAdminPin = (document.getElementById('adminPinSettingInput').value || '').trim();
+    if (newAdminPin) {
+      state.config.adminPin = newAdminPin;
+    }
+    saveStorage(false);
+    renderAll();
+    closeModal('syncModal');
+    startAutoRemoteSync();
+    showToast(state.config.syncEndpoint ? '구글 시트·드라이브 동기화 설정이 저장되었습니다.' : '설정이 저장되었습니다.');
+  }
+
+  function pullFromRemoteEndpoint() {
+    const inputUrl = (document.getElementById('syncEndpointInput').value || state.config.syncEndpoint || '').trim();
+    fetchRemoteVehicles({ silent: false, customUrl: inputUrl });
+  }
+
+  function exportBackupJson() {
+    try {
+      const payload = {
+        exportedAt: new Date().toISOString(),
+        vehicles: state.vehicles,
+        partners: state.partners
+      };
+      const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ACRO_아크로공업사_백업.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('JSON 백업 파일이 저장되었습니다.');
+    } catch (e) {
+      showToast('백업 파일 저장에 실패했습니다.');
+    }
+  }
+
+  function handleImportJson(event) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const parsed = JSON.parse(e.target.result);
+        const list = Array.isArray(parsed) ? parsed : (Array.isArray(parsed.vehicles) ? parsed.vehicles : null);
+        if (!list) {
+          showToast('유효한 차량 백업 JSON 파일이 아닙니다.');
+          return;
+        }
+        state.vehicles = normalizeVehicles(list);
+        saveStorage(true);
+        renderAll();
+        closeModal('syncModal');
+        showToast('JSON 백업 데이터를 복원했습니다.');
+      } catch (err) {
+        showToast('JSON 파일을 읽는 중 오류가 발생했습니다.');
       }
+    };
+    reader.readAsText(file, 'utf-8');
+    event.target.value = '';
+  }
 
-      saveVehicles();
-      renderVehicles();
-      closeModal('vehicleModal');
+  function viewCardPhoto(vehicleId, kind, idx) {
+    const v = state.vehicles.find(item => item.id === vehicleId);
+    if (!v) return;
+    const arr = kind === 'condition' ? v.conditionPhotos : (kind === 'before' ? v.beforePhotos : v.afterPhotos);
+    const label = kind === 'condition' ? '차량 컨디션 체크' : (kind === 'before' ? '작업전' : '작업후');
+    if (!arr || !arr[idx]) return;
+    document.getElementById('photoViewerTitle').textContent = `${v.plate} · ${label} (${idx + 1}/${arr.length})`;
+    document.getElementById('photoViewerImg').src = arr[idx];
+    const m = document.getElementById('photoViewerModal');
+    if (m) { m.classList.add('open'); m.style.display = 'flex'; }
+  }
+
+  function closeModal(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.classList.remove('open');
+      el.style.display = 'none';
+    }
+  }
+
+  function downloadHtmlFile() {
+    try {
+      const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ACRO_아크로공업사_차량입고관리.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast('HTML 앱 파일이 저장되었습니다.');
+    } catch (e) {
+      showToast('브라우저에서 직접 열기 후 저장해 주세요.');
+    }
+  }
+
+  function restoreSampleData() {
+    if (!confirm('초기 샘플 데이터로 복원하시겠습니까?')) return;
+    state.vehicles = normalizeVehicles(INITIAL_VEHICLES);
+    state.statusFilter = 'ALL';
+    document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active'));
+    const allCard = document.getElementById('stat-ALL');
+    if (allCard) allCard.classList.add('active');
+    saveStorage(true);
+    renderAll();
+    showToast('초기 샘플 데이터로 복원되었습니다.');
+  }
+
+  function escapeHtml(str) {
+    return String(str ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
+  function attachTapAndClick(el, handler) {
+    if (!el) return;
+    let startX = 0;
+    let startY = 0;
+    let moved = false;
+    let lastHandledAt = 0;
+
+    function invoke(e) {
+      const now = Date.now();
+      if (now - lastHandledAt < 350) return;
+      lastHandledAt = now;
+      try {
+        handler(e);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+
+    el.addEventListener('touchstart', (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      moved = false;
+    }, { passive: true });
+
+    el.addEventListener('touchmove', (e) => {
+      if (!e.touches || !e.touches[0]) return;
+      if (Math.abs(e.touches[0].clientX - startX) > 14 || Math.abs(e.touches[0].clientY - startY) > 14) {
+        moved = true;
+      }
+    }, { passive: true });
+
+    el.addEventListener('touchend', (e) => {
+      if (moved) return;
+      invoke(e);
+    }, { passive: true });
+
+    el.addEventListener('click', (e) => {
+      invoke(e);
     });
+  }
+
+  function bindEvents() {
+    attachTapAndClick(document.getElementById('btnAdminMode'), requestAdminMode);
+    attachTapAndClick(document.getElementById('btnConfirmAdmin'), confirmAdminLogin);
+    attachTapAndClick(document.getElementById('btnPartnerMode'), () => openPartnerModal());
+    attachTapAndClick(document.getElementById('btnSyncCode'), openSyncModal);
+    attachTapAndClick(document.getElementById('btnSaveHtml'), downloadHtmlFile);
+    attachTapAndClick(document.getElementById('btnNewVehicle'), openCreateModal);
 
     document.querySelectorAll('.stat-card').forEach(card => {
-      card.addEventListener('click', () => {
-        state.statusFilter = card.getAttribute('data-status') || 'ALL';
-        renderVehicles();
+      attachTapAndClick(card, () => {
+        setStatusFilter(card.getAttribute('data-status') || 'ALL');
       });
     });
 
-    $('searchInput').addEventListener('input', (e) => {
-      state.search = e.target.value;
-      renderVehicles();
+    document.getElementById('searchInput').addEventListener('input', renderAll);
+    document.getElementById('partnerFilter').addEventListener('change', renderAll);
+    document.getElementById('typeFilter').addEventListener('change', renderAll);
+    document.getElementById('rentalFilter').addEventListener('change', renderAll);
+    attachTapAndClick(document.getElementById('btnResetFilters'), resetFilters);
+    attachTapAndClick(document.getElementById('btnRestoreSample'), restoreSampleData);
+
+    document.getElementById('vehicleForm').addEventListener('submit', saveVehicle);
+    document.getElementById('fRental').addEventListener('change', toggleRentalInput);
+    document.getElementById('conditionPhotoInput').addEventListener('change', (e) => handlePhotoUpload(e, 'condition'));
+    document.getElementById('beforePhotoInput').addEventListener('change', (e) => handlePhotoUpload(e, 'before'));
+    document.getElementById('afterPhotoInput').addEventListener('change', (e) => handlePhotoUpload(e, 'after'));
+
+    document.getElementById('partnerAuthSelect').addEventListener('change', onPartnerAuthChange);
+    attachTapAndClick(document.getElementById('btnSwitchPartner'), () => switchToPartner());
+    attachTapAndClick(document.getElementById('btnSaveSync'), saveSyncEndpoint);
+    attachTapAndClick(document.getElementById('btnPullRemote'), pullFromRemoteEndpoint);
+    attachTapAndClick(document.getElementById('btnPushAllRemote'), pushAllVehiclesToGas);
+    attachTapAndClick(document.getElementById('btnExportJson'), exportBackupJson);
+    attachTapAndClick(document.getElementById('btnImportJsonTrigger'), () => {
+      document.getElementById('importJsonInput').click();
+    });
+    document.getElementById('importJsonInput').addEventListener('change', handleImportJson);
+
+    document.getElementById('partnerCodeTableBody').addEventListener('click', (e) => {
+      const linkBtn = e.target.closest('.btn-copy-partner-link');
+      if (linkBtn) {
+        copyPartnerShareLink(linkBtn.getAttribute('data-pname'));
+        return;
+      }
+      const btn = e.target.closest('.btn-quick-partner');
+      if (btn) {
+        switchToPartner(btn.getAttribute('data-pname'));
+      }
     });
 
-    $('partnerFilter').addEventListener('change', (e) => {
-      state.partnerFilter = e.target.value;
-      renderVehicles();
+    document.querySelectorAll('[data-close-modal]').forEach(btn => {
+      attachTapAndClick(btn, () => closeModal(btn.getAttribute('data-close-modal')));
     });
 
-    $('typeFilter').addEventListener('change', (e) => {
-      state.typeFilter = e.target.value;
-      renderVehicles();
+    document.getElementById('photoViewerModal').addEventListener('click', () => closeModal('photoViewerModal'));
+    const photoBox = document.querySelector('#photoViewerModal .modal-box');
+    if (photoBox) photoBox.addEventListener('click', (e) => e.stopPropagation());
+
+    document.getElementById('damagePicker').addEventListener('click', (e) => {
+      const btn = e.target.closest('.dmg-btn');
+      if (!btn) return;
+      toggleDamageByIndex(Number(btn.getAttribute('data-dmg-idx')));
     });
 
-    $('rentalFilter').addEventListener('change', (e) => {
-      state.rentalFilter = e.target.value;
-      renderVehicles();
+    document.getElementById('conditionPhotoPreview').addEventListener('click', (e) => {
+      const del = e.target.closest('.photo-del');
+      if (del) removeTempPhoto(del.getAttribute('data-del-kind'), Number(del.getAttribute('data-del-idx')));
+    });
+    document.getElementById('beforePhotoPreview').addEventListener('click', (e) => {
+      const del = e.target.closest('.photo-del');
+      if (del) removeTempPhoto(del.getAttribute('data-del-kind'), Number(del.getAttribute('data-del-idx')));
+    });
+    document.getElementById('afterPhotoPreview').addEventListener('click', (e) => {
+      const del = e.target.closest('.photo-del');
+      if (del) removeTempPhoto(del.getAttribute('data-del-kind'), Number(del.getAttribute('data-del-idx')));
     });
 
-    $('btnResetFilters').addEventListener('click', () => {
-      state.statusFilter = 'ALL';
-      state.search = '';
-      state.partnerFilter = state.mode === 'PARTNER' ? state.activePartner : 'ALL';
-      state.typeFilter = 'ALL';
-      state.rentalFilter = 'ALL';
-      $('searchInput').value = '';
-      $('partnerFilter').value = state.partnerFilter;
-      $('typeFilter').value = 'ALL';
-      $('rentalFilter').value = 'ALL';
-      renderVehicles();
-      showToast('필터가 초기화되었습니다.');
+    const listEl = document.getElementById('vehicleList');
+    listEl.addEventListener('click', (e) => {
+      const thumb = e.target.closest('.thumb-box');
+      if (thumb) {
+        viewCardPhoto(thumb.getAttribute('data-view-vid'), thumb.getAttribute('data-view-kind'), Number(thumb.getAttribute('data-view-idx')));
+        return;
+      }
+      const editBtn = e.target.closest('.btn-edit-vehicle');
+      if (editBtn) {
+        openEditModal(editBtn.getAttribute('data-vid'));
+        return;
+      }
+      const smsBtn = e.target.closest('.btn-copy-sms');
+      if (smsBtn) {
+        copyCustomerSms(smsBtn.getAttribute('data-vid'));
+        return;
+      }
+      const delBtn = e.target.closest('.btn-del-vehicle');
+      if (delBtn) {
+        deleteVehicle(delBtn.getAttribute('data-vid'));
+      }
     });
 
-    $('btnRestoreSample').addEventListener('click', () => {
-      if (!confirm('초기 샘플 데이터로 복원하시겠습니까?')) return;
-      state.vehicles = JSON.parse(JSON.stringify(SAMPLE_VEHICLES));
-      saveVehicles();
-      renderVehicles();
-      showToast('초기 샘플 데이터가 복원되었습니다.');
+    listEl.addEventListener('change', (e) => {
+      const sel = e.target.closest('.quick-status-select');
+      if (sel) {
+        quickStatusChange(sel.getAttribute('data-vid'), sel.value);
+      }
     });
-
-    handlePhotoInput('conditionPhotoInput', 'condition');
-    handlePhotoInput('beforePhotoInput', 'before');
-    handlePhotoInput('afterPhotoInput', 'after');
   }
 
-  document.addEventListener('DOMContentLoaded', () => {
-    loadData();
-    populateSelects();
-    bindEvents();
-    updateModeUI();
+  setupPwaAssets();
+  loadStorage();
+  bindEvents();
+  renderAll();
+  startAutoRemoteSync();
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && state.config.syncEndpoint) {
+      fetchRemoteVehicles({ silent: true });
+    }
   });
 })();
 </script>
