@@ -1042,6 +1042,9 @@
       <button type="button" class="small" data-close-modal="photoViewerModal">닫기 ✕</button>
     </div>
     <img id="photoViewerImg" src="" alt="확대 사진" style="max-width:100%; max-height:70vh; border-radius:10px;">
+    <div id="photoViewerDriveWrap" style="margin-top:10px; display:none;">
+      <a id="photoViewerDriveLink" href="#" target="_blank" rel="noopener noreferrer" class="drive-link-chip">🔗 구글 드라이브 원본 열기</a>
+    </div>
   </div>
 </div>
 
@@ -1054,7 +1057,7 @@
   const CHANNEL_NAME = 'ACRO_MOTORS_SYNC_FINAL_V1';
   const MAX_PHOTOS_PER_TYPE = 30;
   const DEFAULT_ADMIN_PIN = 'ACRO-0000';
-  const DEFAULT_SYNC_ENDPOINT = 'https://script.google.com/macros/s/AKfycbzbKeQCD6F5PJX_9SwippkPyaTJZU71q1XbR12GpjcZT43v_ecla1Z55544Lfw1sVT6zA/exec';
+  const DEFAULT_SYNC_ENDPOINT = 'https://script.google.com/macros/s/AKfycbynVtcsJdPOi8P3a2pIylLG_Y6_-RYqJpZOK6gGCSvoeJRnQxECvd8WJ3mimynbeD-Ycg/exec';
 
   const memoryStore = {
     [STORAGE_KEY]: null,
@@ -1239,6 +1242,42 @@
     tempDamages: []
   };
 
+  function toDriveThumbUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:image') || trimmed.includes('thumbnail?id=')) return trimmed;
+    const m = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m && m[1]) {
+      return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`;
+    }
+    return trimmed;
+  }
+
+  function buildVehiclePhotoEntries(v, kind) {
+    const localArr = kind === 'condition'
+      ? (v.conditionPhotos || [])
+      : (kind === 'before' ? (v.beforePhotos || []) : (v.afterPhotos || []));
+    const linkArr = kind === 'condition'
+      ? (v.driveLinks?.condition || [])
+      : (kind === 'before' ? (v.driveLinks?.before || []) : (v.driveLinks?.after || []));
+
+    const maxLen = Math.max(localArr.length, linkArr.length);
+    const entries = [];
+    for (let i = 0; i < maxLen; i++) {
+      const linkUrl = linkArr[i] || '';
+      const localSrc = localArr[i] || '';
+      const thumbSrc = localSrc || toDriveThumbUrl(linkUrl);
+      if (thumbSrc) {
+        entries.push({
+          src: thumbSrc,
+          driveUrl: linkUrl || (localSrc.startsWith('http') ? localSrc : '')
+        });
+      }
+    }
+    return entries;
+  }
+
   function setupPwaAssets() {
     try {
       const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#111827"/><rect x="14" y="14" width="164" height="164" rx="26" fill="none" stroke="#374151" stroke-width="4"/><text x="96" y="96" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="44" letter-spacing="4" fill="#ef4444">ACRO</text><text x="96" y="136" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#f9fafb">아크로 공업사</text></svg>';
@@ -1415,9 +1454,7 @@
       const rawConfig = JSON.parse(safeGetItem(CONFIG_KEY) || '{}');
       const hasCustomEndpoint = Object.prototype.hasOwnProperty.call(rawConfig, 'syncEndpoint') && String(rawConfig.syncEndpoint || '').trim().length > 0;
       const savedEndpoint = hasCustomEndpoint ? String(rawConfig.syncEndpoint).trim() : DEFAULT_SYNC_ENDPOINT;
-      // 이전 구버전 배포 URL이 로컬스토리지에 남아있을 경우 최신 배포 URL로 자동 업그레이드
-      const legacyUrl = 'https://script.google.com/macros/s/AKfycbyAkLQcqxVU66stG-tB-zvtWxgEuE2G_YXywRKdqg7CO-ixsenyuVzM2LENjZEoFSO7YA/exec';
-      const resolvedEndpoint = (savedEndpoint === legacyUrl || savedEndpoint.indexOf('/macros/echo') !== -1)
+      const resolvedEndpoint = (savedEndpoint.indexOf('/macros/echo') !== -1)
         ? DEFAULT_SYNC_ENDPOINT
         : savedEndpoint;
       state.config = {
@@ -1750,9 +1787,9 @@
         : '';
 
       const thumbs = [
-        ...(v.conditionPhotos || []).map((src, i) => ({ src, label: '컨디션', cls: 'cond', kind: 'condition', idx: i })),
-        ...(v.beforePhotos || []).map((src, i) => ({ src, label: '작업전', cls: '', kind: 'before', idx: i })),
-        ...(v.afterPhotos || []).map((src, i) => ({ src, label: '작업후', cls: '', kind: 'after', idx: i }))
+        ...buildVehiclePhotoEntries(v, 'condition').map((item, i) => ({ src: item.src, label: '컨디션', cls: 'cond', kind: 'condition', idx: i })),
+        ...buildVehiclePhotoEntries(v, 'before').map((item, i) => ({ src: item.src, label: '작업전', cls: '', kind: 'before', idx: i })),
+        ...buildVehiclePhotoEntries(v, 'after').map((item, i) => ({ src: item.src, label: '작업후', cls: '', kind: 'after', idx: i }))
       ];
 
       const driveChips = [
@@ -1765,7 +1802,7 @@
         ? `<div class="v-photos-preview">
             ${thumbs.map(t => `
               <div class="thumb-box" data-view-vid="${escapeHtml(v.id)}" data-view-kind="${t.kind}" data-view-idx="${t.idx}">
-                <img src="${t.src}" alt="${t.label}">
+                <img src="${escapeHtml(t.src)}" alt="${t.label}" loading="lazy">
                 <span class="thumb-tag ${t.cls}">${t.label}</span>
               </div>`).join('')}
             ${driveChips.map(d => `
@@ -1916,9 +1953,9 @@
     document.getElementById('fEstimate').value = v.estimate || '';
     document.getElementById('fMemo').value = v.memo || '';
 
-    state.tempConditionPhotos = [...(v.conditionPhotos || [])];
-    state.tempBeforePhotos = [...(v.beforePhotos || [])];
-    state.tempAfterPhotos = [...(v.afterPhotos || [])];
+    state.tempConditionPhotos = buildVehiclePhotoEntries(v, 'condition').map(e => e.src);
+    state.tempBeforePhotos = buildVehiclePhotoEntries(v, 'before').map(e => e.src);
+    state.tempAfterPhotos = buildVehiclePhotoEntries(v, 'after').map(e => e.src);
     state.tempDriveLinks = {
       condition: [...(v.driveLinks?.condition || [])],
       before: [...(v.driveLinks?.before || [])],
@@ -1998,7 +2035,7 @@
 
     const renderGrid = (arr, kind, altText) => arr.map((src, idx) => `
       <div class="photo-item">
-        <img src="${src}" alt="${altText}">
+        <img src="${escapeHtml(src)}" alt="${altText}">
         <button type="button" class="photo-del" data-del-kind="${kind}" data-del-idx="${idx}">✕</button>
       </div>
     `).join('');
@@ -2323,11 +2360,22 @@
   function viewCardPhoto(vehicleId, kind, idx) {
     const v = state.vehicles.find(item => item.id === vehicleId);
     if (!v) return;
-    const arr = kind === 'condition' ? v.conditionPhotos : (kind === 'before' ? v.beforePhotos : v.afterPhotos);
+    const entries = buildVehiclePhotoEntries(v, kind);
     const label = kind === 'condition' ? '차량 컨디션 체크' : (kind === 'before' ? '작업전' : '작업후');
-    if (!arr || !arr[idx]) return;
-    document.getElementById('photoViewerTitle').textContent = `${v.plate} · ${label} (${idx + 1}/${arr.length})`;
-    document.getElementById('photoViewerImg').src = arr[idx];
+    const current = entries[idx];
+    if (!current || !current.src) return;
+    document.getElementById('photoViewerTitle').textContent = `${v.plate} · ${label} (${idx + 1}/${entries.length})`;
+    document.getElementById('photoViewerImg').src = current.src;
+    const linkWrap = document.getElementById('photoViewerDriveWrap');
+    const linkEl = document.getElementById('photoViewerDriveLink');
+    if (linkWrap && linkEl) {
+      if (current.driveUrl) {
+        linkEl.href = current.driveUrl;
+        linkWrap.style.display = 'block';
+      } else {
+        linkWrap.style.display = 'none';
+      }
+    }
     const m = document.getElementById('photoViewerModal');
     if (m) { m.classList.add('open'); m.style.display = 'flex'; }
   }
@@ -2371,10 +2419,10 @@
 
   function escapeHtml(str) {
     return String(str ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, '&')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"');
   }
 
   function attachTapAndClick(el, handler) {
