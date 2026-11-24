@@ -1068,4 +1068,422 @@
 
   const EXCLUDED_PARTNERS = ['롯데렌터카 대전지점', '수입차 인증중고 딜러'];
 
-  const DAMAGE_
+  const DAMAGE_PARTS = [
+    '앞범퍼', '앞 팬더 (운전석)', '앞 팬더 (조수석)',
+    '앞도어 (운전석)', '앞도어 (조수석)', '뒤도어 (운전석)',
+    '뒤도어 (조수석)', '뒤 팬더 (운전석)', '뒤 팬더 (조수석)',
+    '뒤범퍼', '휠 (운전석 앞)', '휠 (운전석 뒤)',
+    '휠 (조수석 앞)', '휠 (조수석 뒤)', '타이어 (운전석 앞)',
+    '타이어 (운전석 뒤)', '타이어 (조수석 앞)', '타이어 (조수석 뒤)',
+    '헤드라이트 (운전석)', '헤드라이트 (조수석)', '테일램프 (운전석)',
+    '테일램프 (조수석)', '에어백', '하체', '라디에이터'
+  ];
+
+  const INITIAL_VEHICLES = [
+    {
+      id: 'v-9001',
+      partner: '청주 BYD',
+      type: '판금·도장',
+      plate: '219하 4410',
+      model: 'BYD 아토 3',
+      customer: '박준호',
+      phone: '010-5512-9081',
+      insurance: '삼성화재',
+      claimNo: '2026-112044',
+      rental: false,
+      rentalInfo: '',
+      status: '도장 진행',
+      tech: '도장부 강신철',
+      dueDate: '2026-11-24',
+      estimate: '920,000',
+      damages: ['앞범퍼', '앞 팬더 (운전석)'],
+      memo: '도장·열처리 부스 공정 진행 중',
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: [],
+      driveLinks: { condition: [], before: [], after: [] },
+      createdAt: '2026-11-21 10:20'
+    }
+  ];
+
+  const state = {
+    vehicles: [],
+    partners: [],
+    config: {
+      role: 'ADMIN',
+      activePartner: '',
+      syncEndpoint: DEFAULT_SYNC_ENDPOINT,
+      adminPin: DEFAULT_ADMIN_PIN,
+      lockedPartner: false
+    },
+    statusFilter: 'ALL',
+    tempConditionPhotos: [],
+    tempBeforePhotos: [],
+    tempAfterPhotos: [],
+    tempDriveLinks: { condition: [], before: [], after: [] },
+    tempDamages: []
+  };
+
+  function toDriveThumbUrl(url) {
+    if (!url || typeof url !== 'string') return '';
+    const trimmed = url.trim();
+    if (!trimmed) return '';
+    if (trimmed.startsWith('data:image') || trimmed.includes('thumbnail?id=')) return trimmed;
+    const m = trimmed.match(/\/d\/([a-zA-Z0-9_-]+)/) || trimmed.match(/[?&]id=([a-zA-Z0-9_-]+)/);
+    if (m && m[1]) {
+      return `https://drive.google.com/thumbnail?id=${m[1]}&sz=w600`;
+    }
+    return trimmed;
+  }
+
+  function buildVehiclePhotoEntries(v, kind) {
+    const localArr = kind === 'condition'
+      ? (v.conditionPhotos || [])
+      : (kind === 'before' ? (v.beforePhotos || []) : (v.afterPhotos || []));
+    const linkArr = kind === 'condition'
+      ? (v.driveLinks?.condition || [])
+      : (kind === 'before' ? (v.driveLinks?.before || []) : (v.driveLinks?.after || []));
+
+    const maxLen = Math.max(localArr.length, linkArr.length);
+    const entries = [];
+    for (let i = 0; i < maxLen; i++) {
+      const linkUrl = linkArr[i] || '';
+      const localSrc = localArr[i] || '';
+      const thumbSrc = localSrc || toDriveThumbUrl(linkUrl);
+      if (thumbSrc) {
+        entries.push({
+          src: thumbSrc,
+          driveUrl: linkUrl || (localSrc.startsWith('http') ? localSrc : '')
+        });
+      }
+    }
+    return entries;
+  }
+
+  function setupPwaAssets() {
+    try {
+      const svgIcon = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192"><rect width="192" height="192" rx="36" fill="#111827"/><rect x="14" y="14" width="164" height="164" rx="26" fill="none" stroke="#374151" stroke-width="4"/><text x="96" y="96" text-anchor="middle" font-family="sans-serif" font-weight="900" font-size="44" letter-spacing="4" fill="#ef4444">ACRO</text><text x="96" y="136" text-anchor="middle" font-family="sans-serif" font-weight="700" font-size="20" fill="#f9fafb">아크로 공업사</text></svg>';
+      const iconDataUrl = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svgIcon);
+      const appleLink = document.getElementById('appleTouchIconLink');
+      if (appleLink) appleLink.href = iconDataUrl;
+
+      const manifestLink = document.getElementById('manifestLink');
+      if (manifestLink && typeof Blob !== 'undefined' && typeof URL !== 'undefined') {
+        const manifestObj = {
+          name: 'ACRO 아크로 공업사',
+          short_name: 'ACRO 공업사',
+          start_url: './',
+          display: 'standalone',
+          background_color: '#f3f4f6',
+          theme_color: '#111827',
+          icons: [{ src: iconDataUrl, sizes: '192x192', type: 'image/svg+xml', purpose: 'any maskable' }]
+        };
+        const mBlob = new Blob([JSON.stringify(manifestObj)], { type: 'application/manifest+json' });
+        manifestLink.href = URL.createObjectURL(mBlob);
+      }
+    } catch (e) {}
+  }
+
+  let bc = null;
+  let autoSyncTimer = null;
+  let isSyncingRemote = false;
+
+  try {
+    if ('BroadcastChannel' in window) {
+      bc = new BroadcastChannel(CHANNEL_NAME);
+      bc.onmessage = (event) => {
+        if (event.data && event.data.type === 'VEHICLES_UPDATED') {
+          state.vehicles = normalizeVehicles(event.data.vehicles || []);
+          renderAll();
+          showToast('다른 화면에서 변경된 입고 내역이 동기화되었습니다.');
+        }
+      };
+    }
+  } catch (e) {}
+
+  function parseRemoteVehicleList(data) {
+    if (Array.isArray(data)) return data;
+    if (data && Array.isArray(data.vehicles)) return data.vehicles;
+    if (data && data.data && Array.isArray(data.data.vehicles)) return data.data.vehicles;
+    return null;
+  }
+
+  function fetchRemoteVehicles({ silent = false, customUrl = '' } = {}) {
+    const url = (customUrl || state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
+    if (!url) {
+      if (!silent) showToast('먼저 Google Apps Script 웹 앱(..../exec) URL을 입력하세요.');
+      return;
+    }
+    if (url.indexOf('/macros/echo') !== -1) {
+      if (!silent) showToast('구글 시트 연동용 /exec 웹 앱 URL을 입력해 주세요.');
+      return;
+    }
+    if (isSyncingRemote) return;
+    isSyncingRemote = true;
+
+    const sep = url.indexOf('?') === -1 ? '?' : '&';
+    const fetchUrl = `${url}${sep}action=list&_ts=${Date.now()}`;
+
+    fetch(fetchUrl, { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => {
+        const list = parseRemoteVehicleList(data);
+        if (!list) {
+          if (!silent) showToast('불러올 차량 목록 형식이 올바르지 않습니다.');
+          return;
+        }
+        const normalized = normalizeVehicles(list);
+        const prevSerialized = JSON.stringify(state.vehicles);
+        const nextSerialized = JSON.stringify(normalized);
+        if (prevSerialized !== nextSerialized) {
+          state.vehicles = normalized;
+          saveStorage(false);
+          if (bc) {
+            try { bc.postMessage({ type: 'VEHICLES_UPDATED', vehicles: state.vehicles }); } catch (e) {}
+          }
+          renderAll();
+          if (!silent) {
+            showToast('구글 시트에서 최신 데이터를 불러왔습니다.');
+          } else {
+            showToast('최신 구글 시트 데이터가 자동 반영되었습니다.');
+          }
+        } else if (!silent) {
+          showToast('이미 최신 구글 시트 데이터와 동일합니다.');
+        }
+      })
+      .catch(() => {
+        if (!silent) showToast('구글 시트 불러오기에 실패했습니다. 웹 앱 URL과 배포 권한을 확인해 주세요.');
+      })
+      .finally(() => {
+        isSyncingRemote = false;
+      });
+  }
+
+  function startAutoRemoteSync() {
+    if (autoSyncTimer) {
+      clearInterval(autoSyncTimer);
+      autoSyncTimer = null;
+    }
+    if (!state.config.syncEndpoint) return;
+
+    setTimeout(() => {
+      fetchRemoteVehicles({ silent: true });
+    }, 300);
+
+    autoSyncTimer = setInterval(() => {
+      if (document.hidden) return;
+      const modalOpen = document.querySelector('.modal-backdrop.open');
+      if (modalOpen) return;
+      fetchRemoteVehicles({ silent: true });
+    }, 10000);
+  }
+
+  function sanitizePartnerName(name) {
+    if (!name) return '기타 협력 거래처';
+    const trimmed = String(name).trim();
+    if (/^청주\s*byd$/i.test(trimmed)) return '청주 BYD';
+    if (/^대전\s*byd$/i.test(trimmed)) return '대전 BYD';
+    if (EXCLUDED_PARTNERS.includes(trimmed)) return '기타 협력 거래처';
+    return trimmed;
+  }
+
+  function normalizePartners(savedPartners) {
+    const map = new Map();
+    DEFAULT_PARTNERS.forEach(p => map.set(p.name, { ...p }));
+    if (Array.isArray(savedPartners)) {
+      savedPartners.forEach(p => {
+        if (!p || !p.name) return;
+        const cleanName = sanitizePartnerName(p.name);
+        if (!EXCLUDED_PARTNERS.includes(p.name.trim())) {
+          map.set(cleanName, {
+            name: cleanName,
+            code: p.code || (map.get(cleanName) && map.get(cleanName).code) || 'ACRO-PTR'
+          });
+        }
+      });
+    }
+    return Array.from(map.values());
+  }
+
+  function sanitizeTechName(tech) {
+    if (!tech) return '판금부 최성윤 팀장';
+    const t = String(tech).trim();
+    if (t === '이판금 팀장') return '판금부 최성윤 팀장';
+    if (t === '박도장 실장') return '도장부 강신철';
+    if (t === '김정비 반장' || t === '최진단 주임') return '정비부 이성제 팀장';
+    return t;
+  }
+
+  function normalizeVehicles(list) {
+    return (list || []).map(v => ({
+      ...v,
+      partner: sanitizePartnerName(v.partner),
+      tech: sanitizeTechName(v.tech),
+      status: v.status === '정비·도장 진행' ? '판금 진행' : (v.status || '입고·견적 대기'),
+      insurance: v.insurance || '',
+      damages: Array.isArray(v.damages) ? v.damages : [],
+      conditionPhotos: Array.isArray(v.conditionPhotos) ? v.conditionPhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
+      beforePhotos: Array.isArray(v.beforePhotos) ? v.beforePhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
+      afterPhotos: Array.isArray(v.afterPhotos) ? v.afterPhotos.slice(0, MAX_PHOTOS_PER_TYPE) : [],
+      driveLinks: {
+        condition: Array.isArray(v.driveLinks?.condition) ? v.driveLinks.condition : [],
+        before: Array.isArray(v.driveLinks?.before) ? v.driveLinks.before : [],
+        after: Array.isArray(v.driveLinks?.after) ? v.driveLinks.after : []
+      }
+    }));
+  }
+
+  function loadStorage() {
+    try {
+      const rawConfig = JSON.parse(safeGetItem(CONFIG_KEY) || '{}');
+      const hasCustomEndpoint = Object.prototype.hasOwnProperty.call(rawConfig, 'syncEndpoint') && String(rawConfig.syncEndpoint || '').trim().length > 0;
+      const savedEndpoint = hasCustomEndpoint ? String(rawConfig.syncEndpoint).trim() : DEFAULT_SYNC_ENDPOINT;
+      const resolvedEndpoint = (savedEndpoint.indexOf('/macros/echo') !== -1)
+        ? DEFAULT_SYNC_ENDPOINT
+        : savedEndpoint;
+      state.config = {
+        role: rawConfig.role === 'PARTNER' ? 'PARTNER' : 'ADMIN',
+        activePartner: sanitizePartnerName(rawConfig.activePartner || ''),
+        syncEndpoint: resolvedEndpoint,
+        adminPin: rawConfig.adminPin || DEFAULT_ADMIN_PIN,
+        lockedPartner: !!rawConfig.lockedPartner
+      };
+    } catch (e) {}
+
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const urlSync = params.get('sync');
+      if (urlSync && urlSync.trim().indexOf('/macros/echo') === -1) {
+        state.config.syncEndpoint = urlSync.trim();
+      }
+      const urlPartner = params.get('partner');
+      const urlCode = (params.get('code') || '').trim().toUpperCase();
+      if (urlPartner) {
+        const cleanP = sanitizePartnerName(urlPartner);
+        const found = DEFAULT_PARTNERS.find(p => p.name === cleanP);
+        if (found && (!urlCode || urlCode === found.code.toUpperCase())) {
+          state.config.role = 'PARTNER';
+          state.config.activePartner = found.name;
+          state.config.lockedPartner = true;
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const rawData = JSON.parse(safeGetItem(STORAGE_KEY) || 'null');
+      if (Array.isArray(rawData) && rawData.length > 0) {
+        state.vehicles = normalizeVehicles(rawData);
+      } else {
+        state.vehicles = normalizeVehicles(INITIAL_VEHICLES);
+      }
+    } catch (e) {
+      state.vehicles = normalizeVehicles(INITIAL_VEHICLES);
+    }
+
+    state.partners = normalizePartners(state.vehicles.map(v => ({ name: v.partner })));
+    saveStorage(false);
+  }
+
+  function postToGas(payload) {
+    const url = (state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
+    if (!url || url.indexOf('/macros/echo') !== -1) return Promise.resolve(null);
+    return fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload)
+    }).then(res => res.json()).catch(() => null);
+  }
+
+  function saveStorage(broadcast = true, vehicleRecord = null, deletedId = null) {
+    try {
+      safeSetItem(STORAGE_KEY, JSON.stringify(state.vehicles));
+    } catch (e) {
+      showToast('브라우저 저장 용량 한도 초과: 드라이브 링크 기준으로 저장됩니다.');
+    }
+    safeSetItem(CONFIG_KEY, JSON.stringify(state.config));
+
+    if (broadcast && bc) {
+      try { bc.postMessage({ type: 'VEHICLES_UPDATED', vehicles: state.vehicles }); } catch (e) {}
+    }
+
+    if (broadcast && state.config.syncEndpoint) {
+      if (deletedId) {
+        return postToGas({ action: 'deleteVehicle', id: deletedId });
+      } else if (vehicleRecord) {
+        return postToGas({ action: 'upsertVehicle', vehicle: vehicleRecord });
+      } else {
+        return postToGas({ action: 'syncAll', updatedAt: new Date().toISOString(), vehicles: state.vehicles });
+      }
+    }
+    return Promise.resolve(null);
+  }
+
+  function pushAllVehiclesToGas() {
+    const url = (state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
+    if (!url) {
+      showToast('먼저 Google Apps Script 웹 앱(..../exec) URL을 입력하세요.');
+      return;
+    }
+    showToast('구글 시트에 전체 차량 데이터를 업로드하는 중...');
+    postToGas({ action: 'syncAll', updatedAt: new Date().toISOString(), vehicles: state.vehicles })
+      .then(res => {
+        if (res && res.ok) {
+          showToast(`구글 시트에 ${state.vehicles.length}대 동기화 완료`);
+        } else {
+          showToast('시트 응답을 확인해 주세요. (웹 앱 배포 권한 확인)');
+        }
+      });
+  }
+
+  async function uploadPhotosToDrive(record) {
+    const url = (state.config.syncEndpoint || DEFAULT_SYNC_ENDPOINT).trim();
+    if (!url || url.indexOf('/macros/echo') !== -1) return record;
+
+    const kinds = [
+      { photoKey: 'conditionPhotos', linkKey: 'condition' },
+      { photoKey: 'beforePhotos', linkKey: 'before' },
+      { photoKey: 'afterPhotos', linkKey: 'after' }
+    ];
+
+    const driveLinks = {
+      condition: [...(record.driveLinks?.condition || [])],
+      before: [...(record.driveLinks?.before || [])],
+      after: [...(record.driveLinks?.after || [])]
+    };
+
+    const nextPhotos = {
+      conditionPhotos: [],
+      beforePhotos: [],
+      afterPhotos: []
+    };
+
+    let uploadedCount = 0;
+
+    for (const item of kinds) {
+      const list = record[item.photoKey] || [];
+      for (let i = 0; i < list.length; i++) {
+        const src = list[i];
+        if (typeof src === 'string' && src.startsWith('data:image')) {
+          const fileName = `${record.plate || '차량'}_${item.linkKey}_${i + 1}_${Date.now()}.jpg`;
+          const res = await postToGas({
+            action: 'uploadPhoto',
+            plate: record.plate,
+            model: record.model,
+            category: item.linkKey,
+            fileName: fileName,
+            base64Data: src
+          });
+          const savedUrl = (res && res.ok && (res.url || res.thumbUrl)) ? (res.url || res.thumbUrl) : '';
+          if (savedUrl) {
+            driveLinks[item.linkKey].push(savedUrl);
+            uploadedCount++;
+          } else {
+            nextPhotos[item.photoKey].push(src);
+          }
+        } else if (typeof src === 'string') {
+          nextPhotos[item.photoKey].push(src);
+        }
+      }
+    }
+
+    if (uploadedCount > 0) {
