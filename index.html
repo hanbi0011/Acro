@@ -195,3 +195,129 @@
       <option value="ALL">대차(렌터카): 전체</option>
       <option value="RENTAL">대차 신청 차량</option>
       <option value="NO_RENTAL">대차 미신청</option>
+    </select>
+    <div class="filter-footer">
+      <div>
+        <span id="resultCountText">조회된 차량: 0대</span>
+        <button type="button" id="btnResetFilters" class="link-btn">필터 초기화</button>
+      </div>
+      <button type="button" id="btnRestoreSample" class="link-btn muted">↺ 초기 샘플 데이터 복원</button>
+    </div>
+  </section>
+
+  <main id="vehicleList" class="vehicle-list"></main>
+</div>
+
+<div id="vehicleModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3 id="vehicleModalTitle" class="modal-title">신규 차량 입고</h3>
+      <button type="button" class="small" data-close-modal="vehicleModal">닫기 ✕</button>
+    </div>
+    <form id="vehicleForm">
+      <input type="hidden" id="editVehicleId">
+      <div class="filter-row two form-group">
+        <div><label class="form-label">의뢰 거래처 *</label><select id="fPartner" required></select></div>
+        <div>
+          <label class="form-label">입고 구분 *</label>
+          <select id="fType" required>
+            <option value="보험수리">보험수리</option>
+            <option value="일반정비">일반정비</option>
+            <option value="판금·도장">판금·도장</option>
+            <option value="출고점검">출고점검</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">차량번호 *</label><input type="text" id="fPlate" required placeholder="예: 219하 4410"></div>
+        <div><label class="form-label">차종 *</label><input type="text" id="fModel" required placeholder="예: BYD 아토 3"></div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">고객명</label><input type="text" id="fCustomer" placeholder="예: 홍길동"></div>
+        <div><label class="form-label">연락처</label><input type="tel" id="fPhone" placeholder="예: 010-1234-5678"></div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">보험사</label><input type="text" id="fInsurance" placeholder="예: 삼성화재, DB손해보험"></div>
+        <div><label class="form-label">보험/사고 접수번호</label><input type="text" id="fClaimNo" placeholder="예: 2026-88412"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label"><input type="checkbox" id="fRental" style="width:auto;min-height:auto;margin-right:6px;">대차(렌터카) 지원 신청</label>
+        <input type="text" id="fRentalInfo" placeholder="대차 차종 또는 차량번호" style="display:none;margin-top:6px;">
+      </div>
+      <div class="filter-row two form-group">
+        <div>
+          <label class="form-label">공정 상태</label>
+          <select id="fStatus">
+            <option value="입고·견적 대기">입고·견적 대기</option>
+            <option value="판금 진행">판금 진행</option>
+            <option value="도장 진행">도장 진행</option>
+            <option value="출고 대기·완료">출고 대기·완료</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">담당 정비사 / 팀장</label>
+          <select id="fTech">
+            <option value="판금부 최성윤 팀장">판금부 최성윤 팀장</option>
+            <option value="도장부 강신철">도장부 강신철</option>
+            <option value="정비부 이성제 팀장">정비부 이성제 팀장</option>
+          </select>
+        </div>
+      </div>
+      <div class="filter-row two form-group">
+        <div><label class="form-label">출고 예정일</label><input type="date" id="fDueDate"></div>
+        <div><label class="form-label">예상 수리비 (원)</label><input type="text" id="fEstimate" placeholder="예: 850,000"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">손상 부위 선택</label>
+        <div id="damagePicker" class="damage-picker"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">정비/파손 메모</label>
+        <textarea id="fMemo" placeholder="특이사항을 입력하세요"></textarea>
+      </div>
+      <div class="photo-zone form-group">
+        <label class="form-label">🩺 컨디션 체크 사진 (최대 10장)</label>
+        <input type="file" id="conditionPhotoInput" accept="image/*" multiple>
+        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
+        <div id="conditionPhotoPreview" class="photo-grid"></div>
+      </div>
+      <div class="photo-zone form-group">
+        <label class="form-label">📷 작업전 사진 (최대 10장)</label>
+        <input type="file" id="beforePhotoInput" accept="image/*" multiple>
+        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
+        <div id="beforePhotoPreview" class="photo-grid"></div>
+      </div>
+      <div class="photo-zone form-group">
+        <label class="form-label">📸 작업후 사진 (최대 10장)</label>
+        <input type="file" id="afterPhotoInput" accept="image/*" multiple>
+        <div class="photo-hint">선택 시 구글 드라이브 폴더에 저장되고 시트에는 링크만 기록됩니다.</div>
+        <div id="afterPhotoPreview" class="photo-grid"></div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px;">
+        <button type="button" data-close-modal="vehicleModal">취소</button>
+        <button type="submit" id="btnSubmitVehicle" class="primary">저장하기</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div id="adminModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head"><h3 class="modal-title">👤 관리자 로그인</h3><button type="button" class="small" data-close-modal="adminModal">닫기 ✕</button></div>
+    <div class="form-group"><label class="form-label">관리자 PIN</label><input type="password" id="adminPinInput" placeholder="초기값: ACRO-0000"></div>
+    <button type="button" id="btnConfirmAdmin" class="primary" style="width:100%;">관리자 모드로 전환</button>
+  </div>
+</div>
+
+<div id="partnerModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head"><h3 class="modal-title">🏢 거래처 전용 접속</h3><button type="button" class="small" data-close-modal="partnerModal">닫기 ✕</button></div>
+    <div class="form-group"><label class="form-label">거래처 선택</label><select id="partnerAuthSelect"></select></div>
+    <div class="form-group"><label class="form-label">거래처 접속 코드</label><input type="text" id="partnerPinInput" placeholder="예: ACRO-BYD-CJ"></div>
+    <button type="button" id="btnSwitchPartner" class="accent" style="width:100%;">거래처 화면 보기</button>
+  </div>
+</div>
+
+<div id="syncModal" class="modal-backdrop">
+  <div class="modal-box">
+    <div class="modal-head"><h3 class="modal-title">☁️ 구글 시트 동기화 설정</h3><button
