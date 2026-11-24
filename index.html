@@ -128,8 +128,7 @@
   .v-model { font-size: 13px; color: var(--muted); font-weight: 600; }
   .v-meta { display: grid; grid-template-columns: 1fr; gap: 4px; font-size: 12.5px; background: var(--surface-2); padding: 8px 10px; border-radius: var(--radius-sm); }
   @media (min-width: 640px) { .v-meta { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  .v-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-  @media (min-width: 640px) { .v-actions { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .v-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 
   .modal-backdrop {
     position: fixed;
@@ -146,7 +145,7 @@
     background: var(--surface);
     border-radius: var(--radius);
     width: 100%;
-    max-width: 580px;
+    max-width: 660px;
     max-height: 88vh;
     overflow-y: auto;
     padding: 16px;
@@ -156,6 +155,10 @@
   .form-group { margin-bottom: 10px; }
   .form-label { display: block; font-size: 12.5px; font-weight: 700; margin-bottom: 4px; }
   .empty-box { padding: 24px; text-align: center; color: var(--muted); }
+
+  .code-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 8px; }
+  .code-table th, .code-table td { border: 1px solid var(--line); padding: 7px 8px; text-align: left; }
+  .code-table th { background: var(--surface-2); font-weight: 700; }
 
   .toast {
     position: fixed;
@@ -227,7 +230,7 @@
   </section>
 
   <section class="filter-card">
-    <input type="text" id="searchInput" placeholder="🔍 차량번호, 차종, 고객명, 보험사, 담당자 검색">
+    <input type="text" id="searchInput" placeholder="🔍 차량번호, 차종, 고객명, 보험사, 접수번호, 담당자 검색">
     <div class="filter-row two">
       <select id="partnerFilter"></select>
       <select id="statusFilterSelect">
@@ -274,27 +277,40 @@
       <div class="filter-row two form-group">
         <div>
           <label class="form-label">차량번호 *</label>
-          <input type="text" id="fPlate" required placeholder="예: 219하 4410">
+          <input type="text" id="fPlate" required placeholder="예: 42라7945">
         </div>
         <div>
           <label class="form-label">차종 *</label>
-          <input type="text" id="fModel" required placeholder="예: BYD 아토 3">
+          <input type="text" id="fModel" required placeholder="예: 돌핀">
         </div>
       </div>
       <div class="filter-row two form-group">
         <div>
           <label class="form-label">고객명</label>
-          <input type="text" id="fCustomer" placeholder="예: 홍길동">
+          <input type="text" id="fCustomer" placeholder="예: 박준호">
         </div>
         <div>
           <label class="form-label">연락처</label>
-          <input type="text" id="fPhone" placeholder="예: 010-1234-5678">
+          <input type="text" id="fPhone" placeholder="예: 010-5512-9081">
         </div>
       </div>
       <div class="filter-row two form-group">
         <div>
           <label class="form-label">보험사</label>
-          <input type="text" id="fInsurance" placeholder="예: 삼성화재">
+          <input type="text" id="fInsurance" placeholder="예: DB 자차">
+        </div>
+        <div>
+          <label class="form-label">접수번호</label>
+          <input type="text" id="fClaimNo" placeholder="예: 202610726956">
+        </div>
+      </div>
+      <div class="filter-row two form-group">
+        <div>
+          <label class="form-label">대차여부</label>
+          <select id="fRental">
+            <option value="아니오">아니오</option>
+            <option value="예">예</option>
+          </select>
         </div>
         <div>
           <label class="form-label">공정 상태</label>
@@ -308,13 +324,17 @@
       </div>
       <div class="filter-row two form-group">
         <div>
-          <label class="form-label">담당자</label>
+          <label class="form-label">담당정비사</label>
           <input type="text" id="fTech" placeholder="예: 판금부 최성윤 팀장">
         </div>
         <div>
           <label class="form-label">출고 예정일</label>
           <input type="date" id="fDueDate">
         </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">손상부위</label>
+        <input type="text" id="fDamage" placeholder="예: 앞범퍼, 앞 팬더 (운전석)">
       </div>
       <div class="form-group">
         <label class="form-label">정비 메모</label>
@@ -339,25 +359,43 @@
       <label class="form-label">거래처 선택</label>
       <select id="partnerSelectModal"></select>
     </div>
+    <div class="form-group">
+      <label class="form-label">접속 코드 (선택 입력)</label>
+      <input type="text" id="partnerCodeInput" placeholder="예: ACRO-BYD-CJ">
+    </div>
     <button type="button" id="btnApplyPartner" class="accent" style="width:100%;">선택한 거래처만 보기</button>
   </div>
 </div>
 
-<!-- 동기화 설정 모달 -->
+<!-- 동기화 & 거래처 주소 모달 -->
 <div id="syncModal" class="modal-backdrop">
   <div class="modal-box">
     <div class="modal-head">
-      <h3 class="modal-title">구글 시트 동기화</h3>
+      <h3 class="modal-title">구글 시트 동기화 · 거래처별 전용 주소</h3>
       <button type="button" class="small" data-close="syncModal">닫기 ✕</button>
     </div>
     <div class="form-group">
       <label class="form-label">Apps Script 웹 앱 URL (/exec)</label>
       <input type="text" id="endpointInput">
     </div>
-    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;">
       <button type="button" id="btnSaveEndpoint" class="primary small">주소 저장</button>
       <button type="button" id="btnPullSheet" class="small">시트 데이터 불러오기</button>
       <button type="button" id="btnPushSheet" class="small">시트에 내보내기</button>
+    </div>
+    <div class="form-label">거래처별 전용 접속 주소 (읽기전용 · 접속코드)</div>
+    <div style="overflow-x:auto;">
+      <table class="code-table">
+        <thead>
+          <tr>
+            <th>거래처명</th>
+            <th>접속 코드</th>
+            <th>전용 링크</th>
+            <th>바로 전환</th>
+          </tr>
+        </thead>
+        <tbody id="partnerLinkBody"></tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -367,9 +405,37 @@
 <script>
 (function() {
   var ENDPOINT_DEFAULT = 'https://script.google.com/macros/s/AKfycbyIckCGYOdiNi2-gIb60HfFcqJ8JuNudQpjPxbJIxkfXGSxo04m0dzVvtnzUZHS1oRL/exec';
-  var PARTNERS = ['청주 BYD', '대전 BYD', '대전 지프', '안수상', '정재식', '119렉카', '스피드메이트', '케이카', '일반 개인고객', '기타 협력 거래처'];
+  var PARTNERS = [
+    { name: '청주 BYD', code: 'ACRO-BYD-CJ' },
+    { name: '대전 BYD', code: 'ACRO-BYD-DJ' },
+    { name: '대전 지프', code: 'ACRO-JEEP-DJ' },
+    { name: '안수상', code: 'ACRO-ANS' },
+    { name: '정재식', code: 'ACRO-JJS' },
+    { name: '119렉카', code: 'ACRO-119' },
+    { name: '스피드메이트', code: 'ACRO-SM' },
+    { name: '케이카', code: 'ACRO-KCAR' },
+    { name: '일반 개인고객', code: 'ACRO-PERS' },
+    { name: '기타 협력 거래처', code: 'ACRO-ETC' }
+  ];
 
   var vehicles = [
+    {
+      id: 'v-1795508850513',
+      partner: '청주 BYD',
+      type: '보험수리',
+      plate: '42라7945',
+      model: '돌핀',
+      customer: '',
+      phone: '',
+      insurance: 'DB 자차',
+      claimNo: '202610726956',
+      rental: '아니오',
+      status: '입고·견적 대기',
+      tech: '판금부 최성윤 팀장',
+      dueDate: '',
+      damage: '앞범퍼, 앞 팬더 (운전석)',
+      memo: '앞범퍼 교환 팬더 판금 범퍼 레일 및 카울 교환 으로 진행'
+    },
     {
       id: 'v-1001',
       partner: '청주 BYD',
@@ -379,9 +445,12 @@
       customer: '박준호',
       phone: '010-5512-9081',
       insurance: '삼성화재',
+      claimNo: '',
+      rental: '아니오',
       status: '도장 진행',
       tech: '도장부 강신철',
       dueDate: '2026-11-26',
+      damage: '측면 도어 및 쿼터패널',
       memo: '열처리 도장 공정 진행 중'
     }
   ];
@@ -411,16 +480,50 @@
     if (el) el.className = 'modal-backdrop';
   }
 
+  function buildPartnerUrl(partnerObj) {
+    var base = (window.location.origin && window.location.origin !== 'null')
+      ? (window.location.origin + window.location.pathname)
+      : 'https://hanbi0011.github.io/Acro/';
+    var q = new URLSearchParams();
+    q.set('partner', partnerObj.name);
+    q.set('code', partnerObj.code);
+    if (endpoint) q.set('sync', endpoint);
+    return base + '?' + q.toString();
+  }
+
+  function copyText(text, okMsg) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(function() { toast(okMsg); }).catch(function() {
+        toast(text);
+      });
+    } else {
+      toast(text);
+    }
+  }
+
+  function renderPartnerLinkTable() {
+    $('partnerLinkBody').innerHTML = PARTNERS.map(function(p) {
+      return (
+        '<tr>' +
+          '<td><strong>' + p.name + '</strong></td>' +
+          '<td><code>' + p.code + '</code></td>' +
+          '<td><button type="button" class="small" data-copy-partner="' + p.name + '">주소 복사</button></td>' +
+          '<td><button type="button" class="small" data-go-partner="' + p.name + '">전환</button></td>' +
+        '</tr>'
+      );
+    }).join('');
+  }
+
   function fillPartnerSelects() {
     var pFilter = $('partnerFilter');
     var fPartner = $('fPartner');
     var pModal = $('partnerSelectModal');
 
     var htmlAll = '<option value="ALL">거래처: 전체</option>' + PARTNERS.map(function(p) {
-      return '<option value="' + p + '">' + p + '</option>';
+      return '<option value="' + p.name + '">' + p.name + '</option>';
     }).join('');
     var htmlOnly = PARTNERS.map(function(p) {
-      return '<option value="' + p + '">' + p + '</option>';
+      return '<option value="' + p.name + '">' + p.name + '</option>';
     }).join('');
 
     if (role === 'PARTNER' && activePartner) {
@@ -463,7 +566,7 @@
       if (sVal !== 'ALL' && v.status !== sVal) return false;
       if (role !== 'PARTNER' && pVal !== 'ALL' && v.partner !== pVal) return false;
       if (q) {
-        var text = [v.plate, v.model, v.customer, v.insurance, v.tech, v.partner, v.memo].join(' ').toLowerCase();
+        var text = [v.plate, v.model, v.customer, v.insurance, v.claimNo, v.tech, v.partner, v.damage, v.memo].join(' ').toLowerCase();
         if (text.indexOf(q) === -1) return false;
       }
       return true;
@@ -490,11 +593,12 @@
             '<span class="pill ' + statusClass(v.status) + '">' + v.status + '</span>' +
           '</div>' +
           '<div class="v-meta">' +
-            '<div><strong>고객:</strong> ' + (v.customer || '-') + ' (' + (v.phone || '-') + ')</div>' +
-            '<div><strong>담당:</strong> ' + (v.tech || '-') + '</div>' +
-            '<div><strong>보험사:</strong> ' + (v.insurance || '-') + '</div>' +
-            '<div><strong>출고예정:</strong> ' + (v.dueDate || '-') + '</div>' +
+            '<div><strong>고객:</strong> ' + (v.customer || '-') + (v.phone ? ' (' + v.phone + ')' : '') + '</div>' +
+            '<div><strong>담당정비사:</strong> ' + (v.tech || '-') + '</div>' +
+            '<div><strong>보험/접수:</strong> ' + (v.insurance || '-') + (v.claimNo ? ' / ' + v.claimNo : '') + '</div>' +
+            '<div><strong>대차/출고예정:</strong> ' + (v.rental || '아니오') + ' / ' + (v.dueDate || '-') + '</div>' +
           '</div>' +
+          (v.damage ? '<div style="font-size:12.5px; color:#111827;"><strong>손상부위:</strong> ' + v.damage + '</div>' : '') +
           (v.memo ? '<div style="font-size:12.5px; color:#374151;">' + v.memo + '</div>' : '') +
           '<div class="v-actions">' +
             '<button type="button" class="small" data-edit="' + v.id + '">수정</button>' +
@@ -516,24 +620,56 @@
 
   $('btnPartnerMode').addEventListener('click', function() {
     fillPartnerSelects();
+    $('partnerCodeInput').value = '';
     openModal('partnerModal');
   });
 
   $('btnApplyPartner').addEventListener('click', function() {
+    var chosenName = $('partnerSelectModal').value;
+    var pObj = PARTNERS.find(function(x) { return x.name === chosenName; });
+    var typedCode = ($('partnerCodeInput').value || '').trim().toUpperCase();
+    if (typedCode && pObj && typedCode !== pObj.code.toUpperCase()) {
+      toast('접속 코드가 일치하지 않습니다.');
+      return;
+    }
     role = 'PARTNER';
-    activePartner = $('partnerSelectModal').value;
+    activePartner = chosenName;
     closeModal('partnerModal');
     fillPartnerSelects();
     render();
     toast(activePartner + ' 모드로 전환되었습니다.');
   });
 
-  $('btnSyncModal').addEventListener('click', function() {$('endpointInput').value = endpoint;
+  $('btnSyncModal').addEventListener('click', function() {
+    $('endpointInput').value = endpoint;
+    renderPartnerLinkTable();
     openModal('syncModal');
+  });
+
+  $('partnerLinkBody').addEventListener('click', function(e) {
+    var copyBtn = e.target.closest('[data-copy-partner]');
+    if (copyBtn) {
+      var pName = copyBtn.getAttribute('data-copy-partner');
+      var pObj = PARTNERS.find(function(x) { return x.name === pName; });
+      if (pObj) {
+        copyText(buildPartnerUrl(pObj), pObj.name + ' 전용 주소가 복사되었습니다.');
+      }
+      return;
+    }
+    var goBtn = e.target.closest('[data-go-partner]');
+    if (goBtn) {
+      role = 'PARTNER';
+      activePartner = goBtn.getAttribute('data-go-partner');
+      closeModal('syncModal');
+      fillPartnerSelects();
+      render();
+      toast(activePartner + ' 모드로 전환되었습니다.');
+    }
   });
 
   $('btnSaveEndpoint').addEventListener('click', function() {
     endpoint = ($('endpointInput').value || '').trim() || ENDPOINT_DEFAULT;
+    renderPartnerLinkTable();
     closeModal('syncModal');
     toast('웹 앱 주소가 설정되었습니다.');
   });
@@ -576,8 +712,10 @@
     toast('.html 파일을 저장했습니다.');
   });
 
-  $('btnNewVehicle').addEventListener('click', function() {$('vehicleModalTitle').textContent = '신규 차량 입고';
-    $('vehicleForm').reset();$('editId').value = '';
+  $('btnNewVehicle').addEventListener('click', function() {
+    $('vehicleModalTitle').textContent = '신규 차량 입고';
+    $('vehicleForm').reset();
+    $('editId').value = '';
     fillPartnerSelects();
     openModal('vehicleModal');
   });
@@ -594,9 +732,12 @@
       customer: $('fCustomer').value.trim(),
       phone: $('fPhone').value.trim(),
       insurance: $('fInsurance').value.trim(),
+      claimNo: $('fClaimNo').value.trim(),
+      rental: $('fRental').value,
       status: $('fStatus').value,
       tech: $('fTech').value.trim(),
       dueDate: $('fDueDate').value,
+      damage: $('fDamage').value.trim(),
       memo: $('fMemo').value.trim()
     };
     if (id) {
@@ -619,11 +760,14 @@
     });
   });
 
-  $('searchInput').addEventListener('input', render);$('partnerFilter').addEventListener('change', render);
-  $('statusFilterSelect').addEventListener('change', render);$('btnResetFilter').addEventListener('click', function() {
+  $('searchInput').addEventListener('input', render);
+  $('partnerFilter').addEventListener('change', render);
+  $('statusFilterSelect').addEventListener('change', render);
+  $('btnResetFilter').addEventListener('click', function() {
     statusFilter = 'ALL';
     $('searchInput').value = '';
-    if (role !== 'PARTNER') $('partnerFilter').value = 'ALL';$('statusFilterSelect').value = 'ALL';
+    if (role !== 'PARTNER') $('partnerFilter').value = 'ALL';
+    $('statusFilterSelect').value = 'ALL';
     document.querySelectorAll('.stat-card').forEach(function(c, i) {
       c.className = i === 0 ? 'stat-card active' : 'stat-card';
     });
@@ -635,4 +779,58 @@
     var editBtn = e.target.closest('[data-edit]');
     if (editBtn) {
       var id = editBtn.getAttribute('data-edit');
-      var target = vehicles.find(function(v) { return
+      var target = vehicles.find(function(v) { return v.id === id; });
+      if (!target) return;
+      $('vehicleModalTitle').textContent = '차량 수정 · ' + target.plate;
+      $('editId').value = target.id;
+      fillPartnerSelects();
+      $('fPartner').value = target.partner;
+      $('fType').value = target.type;
+      $('fPlate').value = target.plate;
+      $('fModel').value = target.model;
+      $('fCustomer').value = target.customer || '';
+      $('fPhone').value = target.phone || '';
+      $('fInsurance').value = target.insurance || '';
+      $('fClaimNo').value = target.claimNo || '';
+      $('fRental').value = target.rental || '아니오';
+      $('fStatus').value = target.status;
+      $('fTech').value = target.tech || '';
+      $('fDueDate').value = target.dueDate || '';
+      $('fDamage').value = target.damage || '';
+      $('fMemo').value = target.memo || '';
+      openModal('vehicleModal');
+      return;
+    }
+
+    var smsBtn = e.target.closest('[data-sms]');
+    if (smsBtn) {
+      var sId = smsBtn.getAttribute('data-sms');
+      var sv = vehicles.find(function(v) { return v.id === sId; });
+      if (!sv) return;
+      var msg = '[ACRO 아크로 공업사] ' + sv.plate + ' (' + sv.model + ') 현재 공정: ' + sv.status;
+      copyText(msg, '안내문자가 복사되었습니다.');
+      return;
+    }
+
+    var delBtn = e.target.closest('[data-del]');
+    if (delBtn) {
+      var dId = delBtn.getAttribute('data-del');
+      vehicles = vehicles.filter(function(v) { return v.id !== dId; });
+      render();
+      toast('삭제되었습니다.');
+    }
+  });
+
+  document.querySelectorAll('[data-close]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      closeModal(btn.getAttribute('data-close'));
+    });
+  });
+
+  fillPartnerSelects();
+  renderPartnerLinkTable();
+  render();
+})();
+</script>
+</body>
+</html>
