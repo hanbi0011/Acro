@@ -51,7 +51,7 @@
     position: relative;
   }
   .app-wrap {
-    max-width: 1080px;
+    max-width: 980px;
     margin: 0 auto;
     padding: 12px;
     padding-bottom: 92px;
@@ -259,7 +259,7 @@
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    padding: 13px 12px;
+    padding: 13px 14px;
     box-shadow: var(--shadow);
     cursor: pointer;
     min-width: 0;
@@ -283,7 +283,6 @@
     color: var(--muted);
     font-weight: 700;
     margin-bottom: 6px;
-    gap: 4px;
   }
   .stat-num {
     font-size: 24px;
@@ -891,6 +890,7 @@
         </div>
       </div>
 
+      <!-- 손상 부위 세분화 선택 (총 25개) -->
       <div class="form-group">
         <label class="form-label">손상 부위 선택 (원터치 다중 선택)</label>
         <div id="damagePicker" class="damage-picker"></div>
@@ -901,6 +901,7 @@
         <textarea id="fMemo" placeholder="파손 위치, 교환/판금 내용, 특이사항을 입력하세요"></textarea>
       </div>
 
+      <!-- 차량 컨디션 체크 사진 (최대 30장 · 구글 드라이브 업로드) -->
       <div class="photo-zone condition form-group">
         <div class="photo-meta-row">
           <label class="form-label" style="margin:0;">🩺 차량 컨디션 체크 사진 (최대 30장 · 드라이브 저장)</label>
@@ -912,6 +913,7 @@
         <div id="conditionPhotoPreview" class="photo-grid"></div>
       </div>
 
+      <!-- 작업전 사진 (최대 30장 · 구글 드라이브 업로드) -->
       <div class="photo-zone form-group">
         <div class="photo-meta-row">
           <label class="form-label" style="margin:0;">📷 작업전 사진 (최대 30장 · 드라이브 저장)</label>
@@ -922,6 +924,7 @@
         <div id="beforePhotoPreview" class="photo-grid"></div>
       </div>
 
+      <!-- 작업후 사진 (최대 30장 · 구글 드라이브 업로드) -->
       <div class="photo-zone after form-group">
         <div class="photo-meta-row">
           <label class="form-label" style="margin:0;">📸 작업후 사진 (최대 30장 · 드라이브 저장)</label>
@@ -1007,7 +1010,7 @@
       <button type="button" id="btnSaveSync" class="small primary">설정 저장</button>
     </div>
 
-    <div class="form-label">거래처별 전용 링크 복사 &amp; 접속 코드 (거래처는 본인 입고 차량만 조회)</div>
+    <div class="form-label">거래처별 전용 링크 복사 & 접속 코드 (거래처는 본인 입고 차량만 조회)</div>
     <div style="overflow-x:auto;">
       <table class="code-table">
         <thead>
@@ -1276,6 +1279,7 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
+  /* 드라이브 URL에서 fileId 추출 헬퍼 */
   function extractDriveFileId(url) {
     if (!url) return '';
     const s = String(url);
@@ -2027,6 +2031,7 @@
     });
   }
 
+  /* 백엔드 uploadPhotoToDrive_ 규격(base64Data, fileName)에 맞춰 전송 */
   async function uploadSinglePhotoToDrive(prepared, kind, plate, index) {
     const endpoint = (state.config.syncEndpoint || '').trim();
     if (!endpoint) {
@@ -2529,10 +2534,10 @@
 
   function escapeHtml(str) {
     return String(str ?? '')
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;');
+      .replace(/&/g, '&')
+      .replace(/</g, '<')
+      .replace(/>/g, '>')
+      .replace(/"/g, '"');
   }
 
   function bindEvents() {
@@ -2643,7 +2648,7 @@
     });
   }
 
-  setupPwaAssets();
+ setupPwaAssets();
   loadStorage();
   bindEvents();
   renderAll();
