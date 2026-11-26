@@ -1279,6 +1279,26 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
+  function formatDateTimeKST(val) {
+    if (!val) return '-';
+    const s = String(val).trim();
+    const d = new Date(s);
+    if (Number.isNaN(d.getTime())) return s;
+
+    const parts = new Intl.DateTimeFormat('sv-SE', {
+      timeZone: 'Asia/Seoul',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }).formatToParts(d);
+
+    const get = (type) => parts.find(p => p.type === type)?.value || '';
+    return `${get('year')}-${get('month')}-${get('day')} ${get('hour')}:${get('minute')}`;
+  }
+
   /* 드라이브 URL에서 fileId 추출 헬퍼 */
   function extractDriveFileId(url) {
     if (!url) return '';
@@ -1817,7 +1837,7 @@
             <div><strong>고객:</strong> ${escapeHtml(v.customer || '-')} (${escapeHtml(v.phone || '-')})</div>
             <div><strong>담당:</strong> ${escapeHtml(v.tech || '-')}</div>
             <div><strong>보험사:</strong> ${escapeHtml(v.insurance || '미입력')} ${v.claimNo ? `(${escapeHtml(v.claimNo)})` : ''}</div>
-            <div><strong>출고예정:</strong> ${escapeHtml(v.dueDate || '-')} · <strong>예상금액:</strong> ${escapeHtml(v.estimate ? v.estimate + '원' : '-')}</div>
+            <div><strong>출고예정:</strong> ${escapeHtml(formatDateTimeKST(v.dueDate))} · <strong>예상금액:</strong> ${escapeHtml(v.estimate ? v.estimate + '원' : '-')}</div>
           </div>
 
           ${dmgHtml}
@@ -2265,7 +2285,7 @@
     if (!v) return;
     const dmgText = (v.damages && v.damages.length) ? `\n손상부위: ${v.damages.join(', ')}` : '';
     const insText = v.insurance ? `\n보험사: ${v.insurance}${v.claimNo ? ` (${v.claimNo})` : ''}` : '';
-    const msg = `[ACRO 아크로 공업사] ${v.customer || '고객'}님 차량(${v.plate} / ${v.model}) 현재 공정은 [${v.status}]입니다.${insText}${dmgText}${v.dueDate ? `\n출고예정일: ${v.dueDate}` : ''}`;
+    const msg = `[ACRO 아크로 공업사] ${v.customer || '고객'}님 차량(${v.plate} / ${v.model}) 현재 공정은 [${v.status}]입니다.${insText}${dmgText}${v.dueDate ? `\n출고예정일: ${formatDateTimeKST(v.dueDate)}` : ''}`;
     if (navigator.clipboard && navigator.clipboard.writeText) {
       navigator.clipboard.writeText(msg).then(() => showToast('고객 안내 문자가 복사되었습니다.')).catch(() => fallbackCopy(msg));
     } else {
@@ -2534,10 +2554,10 @@
 
   function escapeHtml(str) {
     return String(str ?? '')
-      .replace(/&/g, '&')
-      .replace(/</g, '<')
-      .replace(/>/g, '>')
-      .replace(/"/g, '"');
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
   }
 
   function bindEvents() {
@@ -2648,7 +2668,7 @@
     });
   }
 
- setupPwaAssets();
+  setupPwaAssets();
   loadStorage();
   bindEvents();
   renderAll();
