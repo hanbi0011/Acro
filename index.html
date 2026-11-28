@@ -252,7 +252,7 @@
   }
   @media (min-width: 720px) {
     .stats-grid {
-      grid-template-columns: repeat(6, minmax(0, 1fr));
+      grid-template-columns: repeat(5, minmax(0, 1fr));
     }
   }
   .stat-card {
@@ -756,11 +756,6 @@
       <div class="stat-num" id="cnt-PAINT">0</div>
       <div class="stat-bottom"><span>열처리·도장</span></div>
     </div>
-    <div class="stat-card" id="stat-조립 대기" data-status="조립 대기">
-      <div class="stat-top"><span>조립 대기</span><span>🔧</span></div>
-      <div class="stat-num" id="cnt-ASSEMBLE">0</div>
-      <div class="stat-bottom"><span>부품·조립</span></div>
-    </div>
     <div class="stat-card" id="stat-출고 대기·완료" data-status="출고 대기·완료">
       <div class="stat-top"><span>출고 대기·완료</span><span>✅</span></div>
       <div class="stat-num" id="cnt-DONE">0</div>
@@ -871,7 +866,6 @@
             <option value="입고·견적 대기">입고·견적 대기</option>
             <option value="판금 진행">판금 진행</option>
             <option value="도장 진행">도장 진행</option>
-            <option value="조립 대기">조립 대기</option>
             <option value="출고 대기·완료">출고 대기·완료</option>
           </select>
         </div>
@@ -1288,25 +1282,8 @@
   function formatDateTimeKST(val) {
     if (!val) return '-';
     const s = String(val).trim();
-
-    if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-
     const d = new Date(s);
-    if (Number.isNaN(d.getTime())) {
-      const m = s.match(/^(\d{4}-\d{2}-\d{2})/);
-      return m ? m[1] : s;
-    }
-
-    const parts = new Intl.DateTimeFormat('sv-SE', {
-      timeZone: 'Asia/Seoul',
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit'
-    }).formatToParts(d);
-
-    const get = (type) => parts.find(p => p.type === type)?.value || '';
-    return `${get('year')}-${get('month')}-${get('day')}`;
-  }
+    if (Number.isNaN(d.getTime())) return s;
 
     const parts = new Intl.DateTimeFormat('sv-SE', {
       timeZone: 'Asia/Seoul',
@@ -1731,7 +1708,6 @@
     document.getElementById('cnt-WAIT').textContent = list.filter(v => v.status === '입고·견적 대기').length;
     document.getElementById('cnt-METAL').textContent = list.filter(v => v.status === '판금 진행').length;
     document.getElementById('cnt-PAINT').textContent = list.filter(v => v.status === '도장 진행').length;
-    document.getElementById('cnt-ASSEMBLE').textContent = list.filter(v => v.status === '조립 대기').length;
     document.getElementById('cnt-DONE').textContent = list.filter(v => v.status === '출고 대기·완료').length;
   }
 
@@ -1766,7 +1742,7 @@
 
   function statusPillClass(status) {
     if (status === '입고·견적 대기') return 'st-wait';
-    if (status === '판금 진행' || status === '도장 진행' || status === '조립 대기') return 'st-work';
+    if (status === '판금 진행' || status === '도장 진행') return 'st-work';
     return 'st-done';
   }
 
@@ -1874,7 +1850,6 @@
                 <option value="입고·견적 대기" ${v.status === '입고·견적 대기' ? 'selected' : ''}>입고·견적 대기</option>
                 <option value="판금 진행" ${v.status === '판금 진행' ? 'selected' : ''}>판금 진행</option>
                 <option value="도장 진행" ${v.status === '도장 진행' ? 'selected' : ''}>도장 진행</option>
-                <option value="조립 대기" ${v.status === '조립 대기' ? 'selected' : ''}>조립 대기</option>
                 <option value="출고 대기·완료" ${v.status === '출고 대기·완료' ? 'selected' : ''}>출고 대기·완료</option>
               </select>
               <button type="button" class="small btn-edit-vehicle" data-vid="${escapeHtml(v.id)}">상세·수정</button>
