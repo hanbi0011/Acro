@@ -1279,7 +1279,7 @@
     return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
   }
 
-  function formatDateOnlyKST(val) {
+  function formatDateTimeKST(val) {
     if (!val) return '-';
     const s = String(val).trim();
     const d = new Date(s);
